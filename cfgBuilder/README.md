@@ -1,6 +1,6 @@
-# Eth and Sub Config Builder
+# Config Builder
 
-This is a simple CLI tool to help automate new ETH and SUB deployments.
+This is a simple CLI tool to help automate deployment of new relayers.
 
 An input JSON config looks like this:
 
@@ -50,5 +50,20 @@ An input JSON config looks like this:
   ]
 }
 ```
-Compile an executable to run `cfgBuilder` with `make install-cfgBuilder ` or `make build-cfgBuilder` 
-Running `./build/cfgBuilder <json-path> <output-path>` will produce config files for ChainBridge, and (optional) place them in the specified path. For each relayer in `relayers` a corresponding config will be generated.
+
+This example would result in three configs, one for each relayer, with each containing the three provided chains.
+
+## Build/Install
+
+```
+$ make build
+```
+OR
+```
+$ make install
+```
+
+## Usage
+```
+$ cfgBuilder <input-file> <output-path>
+```

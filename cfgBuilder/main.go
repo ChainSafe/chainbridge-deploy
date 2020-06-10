@@ -11,7 +11,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ChainSafe/chainbridge-deploy/cfgBuilder"
 	log "github.com/ChainSafe/log15"
 	"github.com/urfave/cli"
 )
@@ -39,13 +38,13 @@ func run(ctx *cli.Context) error {
 	}
 
 	// Read in the config
-	cfg, err := cfgBuilder.ParseDeployConfig(path)
+	cfg, err := ParseDeployConfig(path)
 	if err != nil {
 		return fmt.Errorf("failed to parse config, err %s", err)
 	}
 
 	// Construct the individual relayer configs
-	relayerCfgs, err := cfgBuilder.CreateRelayerConfigs(cfg)
+	relayerCfgs, err := CreateRelayerConfigs(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to construct relayer configs, err %s", err)
 	}
