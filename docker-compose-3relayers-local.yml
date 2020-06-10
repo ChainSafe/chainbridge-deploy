@@ -1,0 +1,36 @@
+version: '3'
+services:
+  bridge-a:
+    build:
+        context: ./ChainBridge/
+    container_name: bridgeA
+    environment:
+      - KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD
+    command: --config /config/config0.toml --verbosity $VERBOSITY
+    volumes:
+      - ./config:/config
+      - ./keys:/keys
+    network_mode: host
+  bridge-b:
+    build:
+        context: ./ChainBridge/
+    container_name: bridgeB
+    environment:
+      - KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD
+    command: --config /config/config1.toml --verbosity $VERBOSITY
+    volumes:
+      - ./config:/config
+      - ./keys:/keys/
+    network_mode: host
+
+  bridge-c:
+    build:
+        context: ./ChainBridge/
+    container_name: bridgeC
+    environment:
+      - KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD
+    command: --config /config/config2.toml --verbosity $VERBOSITY
+    volumes:
+      - ./config:/config
+      - ./keys:/keys/
+    network_mode: host
