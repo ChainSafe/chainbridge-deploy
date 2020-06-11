@@ -4,7 +4,10 @@ This CLI supports on-chain interactions with components of ChainBridge.
 
 ## Installation 
 
-`make install`
+Installation requires the ABI files from the contracts which will be fetched and built from the chainbridge-solidity repo.
+```
+$ make install
+```
 
 ## Usage 
 
