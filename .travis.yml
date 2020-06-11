@@ -1,0 +1,16 @@
+# Copyright 2020 ChainSafe Systems
+# SPDX-License-Identifier: LGPL-3.0-only
+
+cache: npm
+
+jobs:
+  include:
+    - name: "cb-sol-cli"
+      language: node_js
+      node_js: 12
+      env: CI=true
+      script:
+        - pushd cb-sol-cli
+        - make install
+        - cd chainbridge-solidity && SILENT=true make start-ganache
+        - popd && ./ci/ci_cli.sh
