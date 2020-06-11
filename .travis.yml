@@ -3,9 +3,24 @@
 
 cache: npm
 
+branches:
+  only:
+    - master
+
+env:
+  global:
+    - GO111MODULE=on
+
 jobs:
   include:
-    - name: "cb-sol-cli"
+    - name: "Config Builder Tests"
+      language: go
+      go: 1.13.x
+      script:
+        - cd cfgBuilder
+        - make lint
+        - go test ./...
+    - name: "cb-sol-cli Tests"
       language: node_js
       node_js: 12
       env: CI=true
