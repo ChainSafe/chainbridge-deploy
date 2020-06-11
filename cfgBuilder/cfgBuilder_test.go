@@ -10,30 +10,25 @@ import (
 	"os"
 	"reflect"
 	"testing"
-
-	"github.com/ChainSafe/ChainBridge/keystore"
-	utils "github.com/ChainSafe/ChainBridge/shared/ethereum"
-	"github.com/ethereum/go-ethereum/common"
 )
 
 const goerliEndpoint = "http://goerli.com"
 const kottiEndpoint = "http://kotti.com"
 const golangEndpoint = "https://golang.org/"
 
-var AliceKp = keystore.TestKeyRing.EthereumKeys[keystore.AliceKey]
+var EthAddr = "0xff93B45308FD417dF303D6515aB04D9e89a750Ca"
+var SubAddr = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
 
-var exampleContracts = &utils.DeployedContracts{
-	BridgeAddress:         common.HexToAddress("0x76F5c0Da89421dC43fA000bFC3a9a7841aA3a5F3"),
-	ERC20HandlerAddress:   common.HexToAddress("0x9202584Ac2A5081C6d1F27d637d1DD1Fb2AEc6B7"),
-	ERC721HandlerAddress:  common.HexToAddress("0xF171e935472148298A4Fe76628193B6C2020A08a"),
-	GenericHandlerAddress: common.HexToAddress("0x59105441977ecD9d805A4f5b060E34676F50F806"),
-}
+var BridgeAddress = "0x76F5c0Da89421dC43fA000bFC3a9a7841aA3a5F3"
+var ERC20HandlerAddress = "0x9202584Ac2A5081C6d1F27d637d1DD1Fb2AEc6B7"
+var ERC721HandlerAddress = "0xF171e935472148298A4Fe76628193B6C2020A08a"
+var GenericHandlerAddress = "0x59105441977ecD9d805A4f5b060E34676F50F806"
 
 var exampleEthOptsStruct = Opts{
-	BridgeAddress:  exampleContracts.BridgeAddress.Hex(),
-	Erc20Handler:   exampleContracts.ERC20HandlerAddress.Hex(),
-	Erc721Handler:  exampleContracts.ERC721HandlerAddress.Hex(),
-	GenericHandler: exampleContracts.GenericHandlerAddress.Hex(),
+	BridgeAddress:  BridgeAddress,
+	Erc20Handler:   ERC20HandlerAddress,
+	Erc721Handler:  ERC721HandlerAddress,
+	GenericHandler: GenericHandlerAddress,
 	GasLimit:       "100",
 	GasPrice:       "1000",
 	StartBlock:     "10",
@@ -46,33 +41,34 @@ var exampleSubOptsStruct = Opts{
 
 var exampleRawConfig = &RawConfig{
 	RelayerThreshold: "3",
-	Relayers:         []string{AliceKp.Address(), AliceKp.Address(), AliceKp.Address()},
 	EthChains: []EthChainConfig{
 		{
 			Name:           "goerli",
 			ChainId:        "1",
 			Endpoint:       goerliEndpoint,
-			BridgeAddress:  exampleContracts.BridgeAddress.Hex(),
-			Erc20Handler:   exampleContracts.ERC20HandlerAddress.Hex(),
-			Erc721Handler:  exampleContracts.ERC721HandlerAddress.Hex(),
-			GenericHandler: exampleContracts.GenericHandlerAddress.Hex(),
+			BridgeAddress:  BridgeAddress,
+			Erc20Handler:   ERC20HandlerAddress,
+			Erc721Handler:  ERC721HandlerAddress,
+			GenericHandler: GenericHandlerAddress,
 			GasLimit:       "100",
 			GasPrice:       "1000",
 			StartBlock:     "10",
 			Http:           "false",
+			Relayers:       []string{EthAddr, EthAddr, EthAddr},
 		},
 		{
 			Name:           "kotti",
 			ChainId:        "2",
 			Endpoint:       kottiEndpoint,
-			BridgeAddress:  exampleContracts.BridgeAddress.Hex(),
-			Erc20Handler:   exampleContracts.ERC20HandlerAddress.Hex(),
-			Erc721Handler:  exampleContracts.ERC721HandlerAddress.Hex(),
-			GenericHandler: exampleContracts.GenericHandlerAddress.Hex(),
+			BridgeAddress:  BridgeAddress,
+			Erc20Handler:   ERC20HandlerAddress,
+			Erc721Handler:  ERC721HandlerAddress,
+			GenericHandler: GenericHandlerAddress,
 			GasLimit:       "100",
 			GasPrice:       "1000",
 			StartBlock:     "10",
 			Http:           "false",
+			Relayers:       []string{EthAddr, EthAddr, EthAddr},
 		},
 	},
 	SubChains: []SubChainConfig{
@@ -81,39 +77,41 @@ var exampleRawConfig = &RawConfig{
 			ChainId:    "3",
 			Endpoint:   golangEndpoint,
 			StartBlock: "11",
+			Relayers:   []string{SubAddr, SubAddr, SubAddr},
 		},
 	},
 }
 
 var exampleConfig = &Config{
 	RelayerThreshold: big.NewInt(3),
-	Relayers:         []string{AliceKp.Address(), AliceKp.Address(), AliceKp.Address()},
 	EthChains: []EthChainConfig{
 		{
 			Name:           "goerli",
 			ChainId:        "1",
 			Endpoint:       goerliEndpoint,
-			BridgeAddress:  exampleContracts.BridgeAddress.Hex(),
-			Erc20Handler:   exampleContracts.ERC20HandlerAddress.Hex(),
-			Erc721Handler:  exampleContracts.ERC721HandlerAddress.Hex(),
-			GenericHandler: exampleContracts.GenericHandlerAddress.Hex(),
+			BridgeAddress:  BridgeAddress,
+			Erc20Handler:   ERC20HandlerAddress,
+			Erc721Handler:  ERC721HandlerAddress,
+			GenericHandler: GenericHandlerAddress,
 			GasLimit:       "100",
 			GasPrice:       "1000",
 			StartBlock:     "10",
 			Http:           "false",
+			Relayers:       []string{EthAddr, EthAddr, EthAddr},
 		},
 		{
 			Name:           "kotti",
 			ChainId:        "2",
 			Endpoint:       kottiEndpoint,
-			BridgeAddress:  exampleContracts.BridgeAddress.Hex(),
-			Erc20Handler:   exampleContracts.ERC20HandlerAddress.Hex(),
-			Erc721Handler:  exampleContracts.ERC721HandlerAddress.Hex(),
-			GenericHandler: exampleContracts.GenericHandlerAddress.Hex(),
+			BridgeAddress:  BridgeAddress,
+			Erc20Handler:   ERC20HandlerAddress,
+			Erc721Handler:  ERC721HandlerAddress,
+			GenericHandler: GenericHandlerAddress,
 			GasLimit:       "100",
 			GasPrice:       "1000",
 			StartBlock:     "10",
 			Http:           "false",
+			Relayers:       []string{EthAddr, EthAddr, EthAddr},
 		},
 	},
 	SubChains: []SubChainConfig{
@@ -122,45 +120,9 @@ var exampleConfig = &Config{
 			ChainId:    "3",
 			Endpoint:   golangEndpoint,
 			StartBlock: "11",
+			Relayers:   []string{SubAddr, SubAddr, SubAddr},
 		},
 	},
-}
-
-func TestCreateRelayerConfig(t *testing.T) {
-	input := exampleConfig
-
-	expected := RootConfig{Chains: []RawChainConfig{
-		{
-			Name:     "goerli",
-			Type:     "ethereum",
-			Id:       "1",
-			From:     AliceKp.CommonAddress().Hex(),
-			Endpoint: goerliEndpoint,
-			Opts:     exampleEthOptsStruct,
-		},
-		{
-			Name:     "kotti",
-			Type:     "ethereum",
-			Id:       "2",
-			From:     AliceKp.CommonAddress().Hex(),
-			Endpoint: kottiEndpoint,
-			Opts:     exampleEthOptsStruct,
-		},
-		{
-			Name:     "gopher",
-			Type:     "substrate",
-			Id:       "3",
-			From:     AliceKp.CommonAddress().Hex(),
-			Endpoint: golangEndpoint,
-			Opts:     exampleSubOptsStruct,
-		},
-	}}
-
-	result := constructRelayerConfig(input, AliceKp.Address())
-
-	if !reflect.DeepEqual(expected, result) {
-		t.Fatalf("Mismatch.\n\tExpected: %#v\n\tGot:%#v", expected, result)
-	}
 }
 
 func TestParseConfig(t *testing.T) {
@@ -197,7 +159,7 @@ func TestCreateRelayerConfigs(t *testing.T) {
 					Type:     "ethereum",
 					Id:       "1",
 					Endpoint: goerliEndpoint,
-					From:     AliceKp.Address(),
+					From:     EthAddr,
 					Opts:     exampleEthOptsStruct,
 				},
 				{
@@ -205,14 +167,14 @@ func TestCreateRelayerConfigs(t *testing.T) {
 					Type:     "ethereum",
 					Id:       "2",
 					Endpoint: kottiEndpoint,
-					From:     AliceKp.Address(),
+					From:     EthAddr,
 					Opts:     exampleEthOptsStruct,
 				},
 				{
 					Name:     "gopher",
 					Type:     "substrate",
 					Id:       "3",
-					From:     AliceKp.CommonAddress().Hex(),
+					From:     SubAddr,
 					Endpoint: golangEndpoint,
 					Opts:     exampleSubOptsStruct,
 				},
@@ -225,7 +187,7 @@ func TestCreateRelayerConfigs(t *testing.T) {
 					Type:     "ethereum",
 					Id:       "1",
 					Endpoint: goerliEndpoint,
-					From:     AliceKp.Address(),
+					From:     EthAddr,
 					Opts:     exampleEthOptsStruct,
 				},
 				{
@@ -233,14 +195,14 @@ func TestCreateRelayerConfigs(t *testing.T) {
 					Type:     "ethereum",
 					Id:       "2",
 					Endpoint: kottiEndpoint,
-					From:     AliceKp.Address(),
+					From:     EthAddr,
 					Opts:     exampleEthOptsStruct,
 				},
 				{
 					Name:     "gopher",
 					Type:     "substrate",
 					Id:       "3",
-					From:     AliceKp.CommonAddress().Hex(),
+					From:     SubAddr,
 					Endpoint: golangEndpoint,
 					Opts:     exampleSubOptsStruct,
 				},
@@ -253,7 +215,7 @@ func TestCreateRelayerConfigs(t *testing.T) {
 					Type:     "ethereum",
 					Id:       "1",
 					Endpoint: goerliEndpoint,
-					From:     AliceKp.Address(),
+					From:     EthAddr,
 					Opts:     exampleEthOptsStruct,
 				},
 				{
@@ -261,14 +223,14 @@ func TestCreateRelayerConfigs(t *testing.T) {
 					Type:     "ethereum",
 					Id:       "2",
 					Endpoint: kottiEndpoint,
-					From:     AliceKp.Address(),
+					From:     EthAddr,
 					Opts:     exampleEthOptsStruct,
 				},
 				{
 					Name:     "gopher",
 					Type:     "substrate",
 					Id:       "3",
-					From:     AliceKp.CommonAddress().Hex(),
+					From:     SubAddr,
 					Endpoint: golangEndpoint,
 					Opts:     exampleSubOptsStruct,
 				},
@@ -279,6 +241,10 @@ func TestCreateRelayerConfigs(t *testing.T) {
 	actual, err := CreateRelayerConfigs(exampleConfig)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if len(expected) != len(actual) {
+		t.Errorf("Incorrect number of relayer configs. Expected: %d Got: %d", len(expected), len(actual))
 	}
 
 	if !reflect.DeepEqual(expected, actual) {

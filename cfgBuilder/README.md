@@ -7,11 +7,6 @@ An input JSON config looks like this:
 ```json
 {
   "relayerThreshold": "3",
-  "relayers": [
-    "0xff93B45308FD417dF303D6515aB04D9e89a750Ca",
-    "0x8e0a907331554AF72563Bd8D43051C2E64Be5d35",
-    "0x24962717f8fA5BA3b931bACaF9ac03924EB475a0"
-  ],
   "ethChains": [
     {
       "name": "goerli",
@@ -24,7 +19,12 @@ An input JSON config looks like this:
       "gasLimit": "1000000",
       "gasPrice": "20000000",
       "startBlock": "0",
-      "http": "false"
+      "http": "false",
+      "relayers": [
+        "0xff93B45308FD417dF303D6515aB04D9e89a750Ca",
+        "0x8e0a907331554AF72563Bd8D43051C2E64Be5d35",
+        "0x24962717f8fA5BA3b931bACaF9ac03924EB475a0"
+      ]
     },
     {
       "name": "kotti",
@@ -37,7 +37,12 @@ An input JSON config looks like this:
       "gasLimit": "1000000",
       "gasPrice": "20000000",
       "startBlock": "0",
-      "http": "true"
+      "http": "true",
+      "relayers": [
+        "0xff93B45308FD417dF303D6515aB04D9e89a750Ca",
+        "0x8e0a907331554AF72563Bd8D43051C2E64Be5d35",
+        "0x24962717f8fA5BA3b931bACaF9ac03924EB475a0"
+      ]
     }
   ],
   "subChains": [
@@ -45,7 +50,12 @@ An input JSON config looks like this:
       "name":       "gopher",
       "chainId":    "3",
       "endpoint":   "http://localhost:8546",
-      "startBlock": "11"
+      "startBlock": "11",
+      "relayers": [
+        "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+        "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
+        "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y"
+      ]
     }
   ]
 }

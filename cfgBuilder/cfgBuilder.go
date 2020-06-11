@@ -15,7 +15,6 @@ import (
 
 type RawConfig struct {
 	RelayerThreshold string           `json:"relayerThreshold"`
-	Relayers         []string         `json:"relayers"`
 	EthChains        []EthChainConfig `json:"ethChains"`
 	SubChains        []SubChainConfig `json:"subChains"`
 }
@@ -54,24 +53,26 @@ type Opts struct {
 }
 
 type EthChainConfig struct {
-	Name           string `json:"name"`
-	ChainId        string `json:"chainId"`
-	Endpoint       string `json:"endpoint"`
-	BridgeAddress  string `json:"bridge"`
-	Erc20Handler   string `json:"erc20Handler"`
-	Erc721Handler  string `json:"erc721Handler"`
-	GenericHandler string `json:"genericHandler"`
-	GasLimit       string `json:"gasLimit"`
-	GasPrice       string `json:"gasPrice"`
-	StartBlock     string `json:"startBlock"`
-	Http           string `json:"http"`
+	Name           string   `json:"name"`
+	ChainId        string   `json:"chainId"`
+	Endpoint       string   `json:"endpoint"`
+	BridgeAddress  string   `json:"bridge"`
+	Erc20Handler   string   `json:"erc20Handler"`
+	Erc721Handler  string   `json:"erc721Handler"`
+	GenericHandler string   `json:"genericHandler"`
+	GasLimit       string   `json:"gasLimit"`
+	GasPrice       string   `json:"gasPrice"`
+	StartBlock     string   `json:"startBlock"`
+	Http           string   `json:"http"`
+	Relayers       []string `json:"relayers"`
 }
 
 type SubChainConfig struct {
-	Name       string `json:"name"`
-	ChainId    string `json:"chainId"`
-	Endpoint   string `json:"endpoint"`
-	StartBlock string `json:"startBlock"`
+	Name       string   `json:"name"`
+	ChainId    string   `json:"chainId"`
+	Endpoint   string   `json:"endpoint"`
+	StartBlock string   `json:"startBlock"`
+	Relayers   []string `json:"relayers"`
 }
 
 func (c *RootConfig) ToJSON(file string) *os.File {
@@ -81,7 +82,7 @@ func (c *RootConfig) ToJSON(file string) *os.File {
 	)
 
 	var raw []byte
-	if raw, err = json.Marshal(*c); err != nil {
+	if raw, err = json.MarshalIndent(*c, "", "\t"); err != nil {
 		log.Warn("error marshalling json", "err", err)
 		os.Exit(1)
 	}
@@ -134,21 +135,6 @@ func constructSubChainConfig(cfg SubChainConfig, relayer string) RawChainConfig 
 	}
 }
 
-func constructRelayerConfig(cfg *Config, relayer string) RootConfig {
-	// Create RawConfig structs from the provided Chains
-	var rawCfgs []RawChainConfig
-	for _, chain := range cfg.EthChains {
-		raw := constructEthChainConfig(chain, relayer)
-		rawCfgs = append(rawCfgs, raw)
-	}
-	for _, chain := range cfg.SubChains {
-		raw := constructSubChainConfig(chain, relayer)
-		rawCfgs = append(rawCfgs, raw)
-	}
-
-	return RootConfig{Chains: rawCfgs}
-}
-
 func parseRawConfig(raw *RawConfig) (*Config, error) {
 	var res Config
 
@@ -157,7 +143,6 @@ func parseRawConfig(raw *RawConfig) (*Config, error) {
 		return nil, fmt.Errorf("failed to parse relayer threshold")
 	}
 	res.RelayerThreshold = threshold
-	res.Relayers = raw.Relayers
 	res.SubChains = raw.SubChains
 	res.EthChains = raw.EthChains
 	return &res, nil
@@ -185,10 +170,39 @@ func ParseDeployConfig(path string) (*Config, error) {
 
 // CreateRelayerConfigs takes a prepared config and constructs the configs for each relayer
 func CreateRelayerConfigs(cfg *Config) ([]RootConfig, error) {
-	var configs []RootConfig
-	for _, relayer := range cfg.Relayers {
-		rCfg := constructRelayerConfig(cfg, relayer)
-		configs = append(configs, rCfg)
+	var unsortedConfigs [][]RawChainConfig
+
+	for _, chain := range cfg.EthChains {
+		var cfgs []RawChainConfig
+		for _, relayer := range chain.Relayers {
+			cfgs = append(cfgs, constructEthChainConfig(chain, relayer))
+		}
+
+		unsortedConfigs = append(unsortedConfigs, cfgs)
+	}
+
+	for _, chain := range cfg.SubChains {
+		var cfgs []RawChainConfig
+		for _, relayer := range chain.Relayers {
+			cfgs = append(cfgs, constructSubChainConfig(chain, relayer))
+		}
+
+		unsortedConfigs = append(unsortedConfigs, cfgs)
+	}
+
+	max := 0
+	for _, cfg := range unsortedConfigs {
+		if len(cfg) > max {
+			max = len(cfg)
+		}
+	}
+
+	configs := make([]RootConfig, max)
+
+	for _, cfg := range unsortedConfigs {
+		for i, rCfg := range cfg {
+			configs[i].Chains = append(configs[i].Chains, rCfg)
+		}
 	}
 
 	return configs, nil
