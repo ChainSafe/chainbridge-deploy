@@ -1,0 +1,10 @@
+# Copyright 2020 ChainSafe Systems
+# SPDX-License-Identifier: LGPL-3.0-only
+
+jobs:
+  include:
+    - name: "Config Builder Tests"
+      language: go
+      go: 1.13.x
+      script:
+        - cd cfgBuilder && go test ./...
