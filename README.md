@@ -6,4 +6,4 @@ Please see the [README](/cfgBuilder/README.md).
 
 ## cb-sol-cli
 
-[WIP]
+Please see the [README](/cb-sol-cli/README.md).
