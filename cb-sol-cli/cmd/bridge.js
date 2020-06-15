@@ -27,9 +27,9 @@ const registerGenericResourceCmd = new Command("register-generic-resource")
     .option('--handler <address>', 'Handler contract address', constants.GENERIC_HANDLER_ADDRESS)
     .option('--targetContract <address>', `Contract address to be registered`, constants.CENTRIFUGE_ASSET_STORE_ADDRESS)
     .option('--resourceId <address>', `ResourceID to be registered`, constants.GENERIC_RESOURCEID)
-    .option('--deposit <string>', "Function signature of the deposit functions", EMPTY_SIG)
-    .option('--execute <string>', "Function signature of the proposal execution function", EMPTY_SIG)
-    .option('--hash', "Treat signature inputs as function signature strings, hash and take the first 4 bytes", false)
+    .option('--deposit <string>', "Deposit function signature", EMPTY_SIG)
+    .option('--execute <string>', "Execute proposal function signature", EMPTY_SIG)
+    .option('--hash', "Treat signature inputs as function prototype strings, hash and take the first 4 bytes", false)
     .action(async function(args) {
         await setupParentArgs(args, args.parent.parent)
 

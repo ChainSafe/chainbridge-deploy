@@ -27,9 +27,9 @@ Register a resource ID with a contract address for a generic handler.
   --handler <address>         Handler contract address
   --targetContract <address>  Contract address to be registered
   --resourceId <address>      ResourceID to be registered
-  --deposit <string>          Function signature of the deposit functions
-  --execute <string>          Function signature of the proposal execution function
-  --hash                      Treat signature inputs as function signature strings, hash and take the first 4 bytes 
+  --deposit <string>          Deposit function signature
+  --execute <string>          Execute proposal function signature
+  --hash                      Treat signature inputs as function prototype strings, hash and take the first 4 bytes 
 ```
 
 ## `set-burn`
