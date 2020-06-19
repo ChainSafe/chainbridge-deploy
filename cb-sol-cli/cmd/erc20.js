@@ -57,14 +57,13 @@ const depositCmd = new Command("deposit")
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
 
         const data = '0x' +
-            args.resourceId.substr(2) +              // OriginHandlerAddress  (32 bytes)
             ethers.utils.hexZeroPad(ethers.utils.bigNumberify(args.amount).toHexString(), 32).substr(2) +    // Deposit Amount        (32 bytes)
             ethers.utils.hexZeroPad(ethers.utils.hexlify((args.recipient.length - 2)/2), 32).substr(2) +    // len(recipientAddress) (32 bytes)
             args.recipient.substr(2);                    // recipientAddress      (?? bytes)
 
         log(args, `Constructed deposit:`)
         log(args, `  Resource Id: ${args.resourceId}`)
-        log(args, `  Amount: ${args.amount}`)
+        log(args, `  Amount: ${ethers.utils.bigNumberify(args.amount).toHexString()}`)
         log(args, `  len(recipient): ${(args.recipient.length - 2)/ 2}`)
         log(args, `  Recipient: ${args.recipient}`)
         log(args, `  Raw: ${data}`)
