@@ -15,12 +15,12 @@ set -eux
 
 cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE deploy --all
 
-cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 mint
+cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 mint --amount 100
 cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 add-minter
 cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE bridge register-resource
 cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE bridge set-burn
-cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 approve
-cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 deposit
+cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 approve --amount 100
+cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 deposit --amount 100
 cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 balance
 
 cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc721 mint --id 0x1

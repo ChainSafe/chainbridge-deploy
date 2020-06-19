@@ -58,7 +58,7 @@ const depositCmd = new Command("deposit")
 
         const data = '0x' +
             args.resourceId.substr(2) +              // OriginHandlerAddress  (32 bytes)
-            ethers.utils.hexZeroPad(ethers.utils.hexlify(Number(args.amount)), 32).substr(2) +    // Deposit Amount        (32 bytes)
+            ethers.utils.hexZeroPad(ethers.utils.bigNumberify(args.amount), 32).substr(2) +    // Deposit Amount        (32 bytes)
             ethers.utils.hexZeroPad(ethers.utils.hexlify((args.recipient.length - 2)/2), 32).substr(2) +    // len(recipientAddress) (32 bytes)
             args.recipient.substr(2);                    // recipientAddress      (?? bytes)
 
