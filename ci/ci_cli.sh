@@ -20,6 +20,7 @@ cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 add-minter
 cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE bridge register-resource
 cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE bridge set-burn
 cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 approve --amount 100
+cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 allowance
 cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 deposit --amount 100
 cb-sol-cli --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 balance
 
