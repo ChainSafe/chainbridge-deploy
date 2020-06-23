@@ -3,8 +3,9 @@
 - [`register-resource`](#register-resource)
 - [`register-generic-resource`](#register-generic-resource)
 - [`set-burn`](#set-burn)
-- [`query-proposal`](#query-proposal)
 - [`cancel-proposal`](#cancel-proposal)
+- [`query-proposal`](#query-proposal)
+- [`query-resource`](#query-resouce)
 
 
 ## `register-resource`
@@ -41,15 +42,6 @@ Set a token contract as mintable/burnable in a handler.
   --tokenContract <address>  Token contract to be registered
 ```
 
-## `query-proposal`
-Query a proposal on-chain.
-
-```
-  --bridge <address>        Bridge contract address
-  --depositNonce <address>  Nonce of proposal
-  --chainId <id>            Source chain ID of proposal
-```
-
 ## `cancel-proposal`
 Cancels an expired proposal.
 
@@ -57,4 +49,23 @@ Cancels an expired proposal.
   --bridge <address>      Bridge contract address
   --chainId <id>          Chain ID of proposal to cancel
   --depositNonce <value>  Deposit nonce of proposal to cancel
+```
+
+## `query-proposal`
+Queries an inbound proposal.
+
+```
+  --bridge <address>      Bridge contract address 
+  --chainId <id>          Source chain ID of proposal
+  --depositNonce <value>  Deposit nonce of proposal
+  --dataHash <value>      Hash of proposal metadata
+```
+
+## `query-resouce`
+Queries the contract address associated with the provided resource ID for a specific handler contract.
+
+```
+  --handler <address>     Handler contract address 
+  --resourceId <address>  ResourceID to query
+
 ```

@@ -59,23 +59,6 @@ const setBurnCmd = new Command("set-burn")
         await waitForTx(args.provider, tx.hash)
     })
 
-const queryProposalCmd = new Command("query-proposal")
-    .description("Query a proposal on-chain")
-    .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
-    .option('--depositNonce <address>', 'Nonce of proposal', 0)
-    .option('--chainId <id>', 'Source chain ID of proposal', constants.DEFAULT_SOURCE_ID)
-    .action(async function (args) {
-        await setupParentArgs(args, args.parent.parent)
-
-        // Instances
-        const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
-
-        const prop = await bridgeInstance.getProposal(args.chainId, args.depositNonce)
-        log(args, `Source: ${args.chainId} Nonce: ${args.depositNonce}`)
-        log(args, `Votes: ${prop._yesVotes} Status: ${prop._status}`)
-    })
-
-
 const cancelProposalCmd = new Command("cancel-proposal")
     .description("Cancel a proposal that has passed the expiry threshold")
     .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
@@ -90,7 +73,7 @@ const cancelProposalCmd = new Command("cancel-proposal")
         await waitForTx(args.provider, tx.hash)
     })
 
-const getProposalCmd = new Command("get-proposal")
+const queryProposalCmd = new Command("query-proposal")
     .description("Queries a proposal")
     .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
     .option('--chainId <id>', 'Source chain ID of proposal', 0)
@@ -108,7 +91,7 @@ const getProposalCmd = new Command("get-proposal")
 const queryResourceId = new Command("query-resource")
     .description("Query the contract address associated with a resource ID")
     .option('--handler <address>', 'Handler contract address', constants.ERC20_HANDLER_ADDRESS)
-    .option('--resourceId <address>', `ResourceID to be queried`, constants.ERC20_RESOURCEID)
+    .option('--resourceId <address>', `ResourceID to query`, constants.ERC20_RESOURCEID)
     .action(async function(args) {
         await setupParentArgs(args, args.parent.parent)
 
@@ -123,9 +106,8 @@ const bridgeCmd = new Command("bridge")
 bridgeCmd.addCommand(registerResourceCmd)
 bridgeCmd.addCommand(registerGenericResourceCmd)
 bridgeCmd.addCommand(setBurnCmd)
-bridgeCmd.addCommand(queryProposalCmd)
 bridgeCmd.addCommand(cancelProposalCmd)
-bridgeCmd.addCommand(getProposalCmd)
+bridgeCmd.addCommand(queryProposalCmd)
 bridgeCmd.addCommand(queryResourceId)
 
 module.exports = bridgeCmd

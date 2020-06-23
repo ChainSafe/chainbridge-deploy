@@ -115,7 +115,7 @@ const proposalDataHashCmd = new Command("data-hash")
     .option('--id <value>', "Token ID", 1)
     .option('--recipient <address>', 'Destination recipient address', constants.relayerAddresses[4])
     .option('--metadata <metadata>', 'Token metadata', "")
-    .option('--handler <address>', 'ERC20 handler  address', constants.ERC20_HANDLER_ADDRESS)
+    .option('--handler <address>', 'ERC721 handler address', constants.ERC20_HANDLER_ADDRESS)
     .action(async function (args) {
         console.log(args.metadata)
         const data = createErc721ProposalData(args.id, args.recipient, args.metadata)
