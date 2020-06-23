@@ -33,7 +33,7 @@ const addMinterCmd = new Command("add-minter")
     .description("Add a new minter to the contract")
     .option('--erc721Address <address>', 'ERC721 contract address', constants.ERC721_ADDRESS)
     .option('--minter <address>', 'Minter address', constants.relayerAddresses[1])
-    .action(async function(args) {
+    .action(async function (args) {
         await setupParentArgs(args, args.parent.parent)
         const erc721Instance = new ethers.Contract(args.erc721Address, constants.ContractABIs.Erc721Mintable.abi, args.wallet);
         const MINTER_ROLE = await erc721Instance.MINTER_ROLE()
@@ -52,7 +52,10 @@ const approveCmd = new Command("approve")
         const erc721Instance = new ethers.Contract(args.erc721Address, constants.ContractABIs.Erc721Mintable.abi, args.wallet);
 
         log(args, `Approving ${args.recipient} to spend token ${args.id} from ${args.wallet.address} on contract ${args.erc721Address}!`);
-        const tx = await erc721Instance.approve(args.recipient, ethers.utils.hexlify(args.id), { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
+        const tx = await erc721Instance.approve(args.recipient, ethers.utils.hexlify(args.id), {
+            gasPrice: args.gasPrice,
+            gasLimit: args.gasLimit
+        });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -71,13 +74,13 @@ const depositCmd = new Command("deposit")
 
         const data = '0x' +
             ethers.utils.hexZeroPad(ethers.utils.hexlify(args.id), 32).substr(2) +  // Deposit Amount        (32 bytes)
-            ethers.utils.hexZeroPad(ethers.utils.hexlify((args.recipient.length - 2)/2), 32).substr(2) +       // len(recipientAddress) (32 bytes)
+            ethers.utils.hexZeroPad(ethers.utils.hexlify((args.recipient.length - 2) / 2), 32).substr(2) +       // len(recipientAddress) (32 bytes)
             ethers.utils.hexlify(args.recipient).substr(2)                // recipientAddress      (?? bytes)
 
         log(args, `Constructed deposit:`)
         log(args, `  Resource Id: ${args.resourceId}`)
         log(args, `  Token Id: ${args.id}`)
-        log(args, `  len(recipient): ${(args.recipient.length - 2)/2}`)
+        log(args, `  len(recipient): ${(args.recipient.length - 2) / 2}`)
         log(args, `  Recipient: ${args.recipient}`)
         log(args, `  Raw: ${data}`)
         log(args, "Creating deposit to initiate transfer!")
@@ -87,8 +90,38 @@ const depositCmd = new Command("deposit")
             args.dest, // destination chain id
             args.resourceId,
             data,
-            { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
+            {gasPrice: args.gasPrice, gasLimit: args.gasLimit});
         await waitForTx(args.provider, tx.hash)
+    })
+
+const createErc721ProposalData = (id, recipient, metadata) => {
+    if (recipient.substr(0, 2) === "0x") {
+        recipient = recipient.substr(2)
+    }
+    if (metadata.substr(0, 2) === "0x") {
+        metadata = metadata.substr(2)
+    }
+    console.log(metadata)
+    return '0x' +
+        ethers.utils.hexZeroPad(ethers.utils.bigNumberify(id).toHexString(), 32).substr(2) +
+        ethers.utils.hexZeroPad(ethers.utils.hexlify(recipient.length / 2 + recipient.length % 2), 32).substr(2) +
+        recipient +
+        ethers.utils.hexZeroPad(ethers.utils.hexlify(metadata.length / 2 + metadata.length % 2), 32).substr(2) +
+        metadata;
+}
+
+const proposalDataHashCmd = new Command("data-hash")
+    .description("Hash the proposal data for an erc721 proposal")
+    .option('--id <value>', "Token ID", 1)
+    .option('--recipient <address>', 'Destination recipient address', constants.relayerAddresses[4])
+    .option('--metadata <metadata>', 'Token metadata', "")
+    .option('--handler <address>', 'ERC20 handler  address', constants.ERC20_HANDLER_ADDRESS)
+    .action(async function (args) {
+        console.log(args.metadata)
+        const data = createErc721ProposalData(args.id, args.recipient, args.metadata)
+        const hash = ethers.utils.solidityKeccak256(["address", "bytes"], [args.handler, data])
+
+        log(args, `Hash: ${hash} Data: ${data}`)
     })
 
 const erc721Cmd = new Command("erc721")
@@ -98,5 +131,6 @@ erc721Cmd.addCommand(ownerCmd)
 erc721Cmd.addCommand(addMinterCmd)
 erc721Cmd.addCommand(approveCmd)
 erc721Cmd.addCommand(depositCmd)
+erc721Cmd.addCommand(proposalDataHashCmd)
 
 module.exports = erc721Cmd

@@ -35,6 +35,7 @@ $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE bridge register-resource --hand
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc721 approve --id 0x1
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE bridge set-burn --handler $ERC721_HANDLER --tokenContract $ERC721_CONTRACT
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc721 deposit --id 0x1
+$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc721 data-hash --id 0x1 --metadata "0x1234"
 
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE bridge register-generic-resource --execute "store(bytes32)" --hash
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE cent getHash
