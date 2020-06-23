@@ -12,7 +12,8 @@ const ContractABIs = {
     Erc721Handler: require(CONTRACT_PATH + "/ERC721Handler.json"),
     Erc721Mintable: require(CONTRACT_PATH + "/ERC721MinterBurnerPauser.json"),
     GenericHandler: require(CONTRACT_PATH + "/GenericHandler.json"),
-    CentrifugeAssetStore: require(CONTRACT_PATH + "/CentrifugeAsset.json")
+    CentrifugeAssetStore: require(CONTRACT_PATH + "/CentrifugeAsset.json"),
+    HandlerHelpers: require(CONTRACT_PATH + "/HandlerHelpers.json")
 }
 
 module.exports.ContractABIs = ContractABIs
@@ -53,3 +54,4 @@ module.exports.ERC20_RESOURCEID = ethers.utils.hexZeroPad((this.ERC20_ADDRESS + 
 module.exports.ERC721_RESOURCEID = ethers.utils.hexZeroPad((this.ERC721_ADDRESS + ethers.utils.hexlify(this.DEFAULT_SOURCE_ID).substr(2)), 32);
 module.exports.GENERIC_RESOURCEID = ethers.utils.hexZeroPad((this.CENTRIFUGE_ASSET_STORE_ADDRESS + ethers.utils.hexlify(this.DEFAULT_SOURCE_ID).substr(2)), 32);
 
+module.exports.ERC20_PROPOSAL_HASH = "0x19b14d095647bb784f237072e14df1133fbd2008c5039c469321d77099a7b6da"
