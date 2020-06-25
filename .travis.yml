@@ -29,3 +29,10 @@ jobs:
         - make install
         - cd chainbridge-solidity && SILENT=true make start-ganache
         - popd && ./ci/ci_cli.sh
+    - name: "Deploy Tester Tests"
+      language: go
+      go: 1.13.x
+      script:
+        - cd deploy-test
+        - make lint
+        - make test
