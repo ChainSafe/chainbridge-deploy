@@ -49,7 +49,7 @@ func verifyDepositEvent(t *testing.T, client *utils.Client, block *big.Int, brid
 
 }
 
-// TODO: From chainbridge
+// TODO: REMOVE
 // constructErc20ProposalData returns the bytes to construct a proposal suitable for Erc20
 func constructErc20ProposalData(amount []byte, recipient []byte) []byte {
 	var data []byte
@@ -61,7 +61,7 @@ func constructErc20ProposalData(amount []byte, recipient []byte) []byte {
 	return data
 }
 
-//TODO: From chainbridge, not used here  but should be exported and take ethclient.client
+//TODO: REMOVE
 func watchEvent(client *utils.Client, bridge common.Address, subStr utils.EventSig) {
 	fmt.Printf("Watching for event: %s\n", subStr)
 	query := ethereum.FilterQuery{
