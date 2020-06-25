@@ -165,7 +165,7 @@ func TestClient_CreateFungibleDeposit(t *testing.T) {
 	}
 	// Create deposit
 
-	nonce, blockNum, err := client.CreateFungibleDeposit(amount, AliceKp.CommonAddress().Bytes(), rId, destId)
+	nonce, blockNum, err := client.CreateFungibleDeposit(amount, AliceKp.CommonAddress().Hex(), rId, destId)
 	if err != nil {
 		t.Fatal(err)
 	}

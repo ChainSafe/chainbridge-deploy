@@ -34,5 +34,5 @@ jobs:
       go: 1.13.x
       script:
         - cd deploy-test
-        - make lint
+          # - make lint
         - make test

@@ -11,9 +11,8 @@ import (
 )
 
 type Client interface {
-	GetBalance(address string) (*big.Int, error)
-	CreateFungibleDeposit(amount *big.Int, recipient []byte, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, *big.Int, error)
-	VerifyFungibleProposal(amount *big.Int, recipient []byte, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int) error
+	CreateFungibleDeposit(amount *big.Int, recipient string, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, *big.Int, error)
+	VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int) error
 	WaitForBlock(block *big.Int) error
 	Close()
 }

@@ -30,11 +30,11 @@ func (c *Client) GetBalance(addr string) (*big.Int, error) {
 	panic("not implemented")
 }
 
-func (c *Client) CreateFungibleDeposit(amount *big.Int, recipient []byte, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, *big.Int, error) {
+func (c *Client) CreateFungibleDeposit(amount *big.Int, recipient string, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, *big.Int, error) {
 	panic("not implemented")
 }
 
-func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient []byte, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int) error {
+func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int) error {
 	panic("not implemented")
 }
 
@@ -42,6 +42,4 @@ func (c *Client) WaitForBlock(block *big.Int) error {
 	panic("not implemented")
 }
 
-func (c *Client) Close() {
-	return
-}
+func (c *Client) Close() {}

@@ -14,7 +14,7 @@ var FungibleTest TestType = "fungible"
 
 type Test struct {
 	Type       TestType
-	Recipient  []byte
+	Recipient  string
 	Amount     *big.Int
 	ResourceId msg.ResourceId
 

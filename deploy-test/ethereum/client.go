@@ -15,6 +15,7 @@ import (
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/status-im/keycard-go/hexutils"
 )
 
 var BlockRetryInterval = time.Second * 3
@@ -48,8 +49,8 @@ func NewClient(url string, privateKey string, bridge, erc20 common.Address, log 
 }
 
 // CreateFungibleDeposit submits a deposit to the bridge contract
-func (c *Client) CreateFungibleDeposit(amount *big.Int, recipient []byte, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, *big.Int, error) {
-	data := utils.ConstructErc20DepositData(recipient, amount)
+func (c *Client) CreateFungibleDeposit(amount *big.Int, recipient string, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, *big.Int, error) {
+	data := utils.ConstructErc20DepositData(hexutils.HexToBytes(recipient[2:]), amount)
 
 	bridgeInstance, err := Bridge.NewBridge(c.bridge, c.client.Client)
 	if err != nil {
@@ -80,6 +81,9 @@ func (c *Client) CreateFungibleDeposit(amount *big.Int, recipient []byte, rId ms
 	}
 
 	nonce, err := c.parseDepositNonce(reciept)
+	if err != nil {
+		return 0, nil, err
+	}
 
 	return nonce, reciept.BlockNumber, nil
 }

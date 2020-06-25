@@ -1,14 +1,11 @@
 package main
 
 import (
-	"math/big"
-
 	msg "github.com/ChainSafe/ChainBridge/message"
 	"github.com/ethereum/go-ethereum/common"
 )
 
 type ChainType string
-type Balances map[string]*big.Int
 
 var EthereumType ChainType = "ethereum"
 var SubstrateType ChainType = "substrate"
