@@ -19,7 +19,7 @@ type Client interface {
 }
 
 type TestFailure struct {
-	err error
+	err   error
 	index int
 }
 

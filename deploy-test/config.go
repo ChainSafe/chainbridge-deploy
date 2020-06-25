@@ -14,17 +14,17 @@ var EthereumType ChainType = "ethereum"
 var SubstrateType ChainType = "substrate"
 
 type Config struct {
-	PrivateKey string
-	Source Chain
+	PrivateKey  string
+	Source      Chain
 	Destination Chain
-	Tests []Test
+	Tests       []Test
 }
 
 type Chain struct {
-	Type ChainType
+	Type     ChainType
 	Endpoint string
-	ChainId msg.ChainId
-	Bridge common.Address
-	Erc20 common.Address
-	Client Client
+	ChainId  msg.ChainId
+	Bridge   common.Address
+	Erc20    common.Address
+	Client   Client
 }

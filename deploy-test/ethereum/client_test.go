@@ -25,7 +25,7 @@ var AlicePrivKey = hexutils.BytesToHex(AliceKp.Encode())
 func verifyDepositEvent(t *testing.T, client *utils.Client, block *big.Int, bridge common.Address, expectedNonce msg.Nonce) {
 	query := ethereum.FilterQuery{
 		FromBlock: block,
-		ToBlock: block,
+		ToBlock:   block,
 		Addresses: []common.Address{bridge},
 		Topics: [][]common.Hash{
 			{utils.Deposit.GetTopic()},
@@ -51,10 +51,8 @@ func verifyDepositEvent(t *testing.T, client *utils.Client, block *big.Int, brid
 
 // TODO: From chainbridge
 // constructErc20ProposalData returns the bytes to construct a proposal suitable for Erc20
-func constructErc20ProposalData(amount []byte, recipient []byte, rId msg.ResourceId) []byte {
+func constructErc20ProposalData(amount []byte, recipient []byte) []byte {
 	var data []byte
-	// TODO: Remove once on v.0.0.2-alpha contracts
-	data = append(data, rId[:]...)
 	data = append(data, common.LeftPadBytes(amount, 32)...) // amount (uint256)
 
 	recipientLen := big.NewInt(int64(len(recipient))).Bytes()
@@ -120,7 +118,7 @@ func voteOnErc20Proposal(t *testing.T, client *utils.Client, bridge common.Addre
 	}
 }
 
-func executeErc20Proposal(t *testing.T, client *utils.Client, bridge common.Address, srcId msg.ChainId, nonce msg.Nonce, data []byte) {
+func executeErc20Proposal(t *testing.T, client *utils.Client, bridge common.Address, srcId msg.ChainId, nonce msg.Nonce, data []byte, rId msg.ResourceId) {
 	bridgeInstance, err := Bridge.NewBridge(bridge, client.Client)
 	if err != nil {
 		t.Fatal(err)
@@ -131,7 +129,7 @@ func executeErc20Proposal(t *testing.T, client *utils.Client, bridge common.Addr
 		t.Fatal(err)
 	}
 
-	tx, err := bridgeInstance.ExecuteProposal(client.Opts, uint8(srcId), uint64(nonce), data)
+	tx, err := bridgeInstance.ExecuteProposal(client.Opts, uint8(srcId), uint64(nonce), data, rId)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -206,15 +204,13 @@ func TestClient_VerifyFungibleProposal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Println(startBlock.Number().String())
 
 	// Create, vote, execute proposal
-	data := constructErc20ProposalData(amount.Bytes(), recipient.Bytes(), rId)
+	data := constructErc20ProposalData(amount.Bytes(), recipient.Bytes())
 	voteOnErc20Proposal(t, testClient, contracts.BridgeAddress, srcId, nonce, rId, utils.Hash(append(contracts.ERC20HandlerAddress.Bytes(), data...)))
-	executeErc20Proposal(t, testClient, contracts.BridgeAddress, srcId, nonce, data)
+	executeErc20Proposal(t, testClient, contracts.BridgeAddress, srcId, nonce, data, rId)
 
-
-	err = client.VerifyFungibleProposal(amount, recipient.Bytes(), srcId, nonce, startBlock.Number())
+	err = client.VerifyFungibleProposal(amount, recipient.String(), srcId, nonce, startBlock.Number())
 	if err != nil {
 		t.Fatal(err)
 	}

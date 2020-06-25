@@ -1,7 +1,6 @@
 package ethereum
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -19,22 +18,24 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-var EventTimeout = time.Second * 30
 var BlockRetryInterval = time.Second * 3
+var BlockRetryLimit = 20
 
 // TODO: Should be in chainbridge
 type EventSig string
+
 func (es EventSig) GetTopic() common.Hash {
 	return crypto.Keccak256Hash([]byte(es))
 }
+
 var Erc20TransferEvent EventSig = "Transfer(address,address,uint256)"
 
 type Client struct {
 	client *utils.Client
 	bridge common.Address
 	erc20  common.Address
-	stop chan int
-	log log.Logger
+	stop   chan int
+	log    log.Logger
 }
 
 func NewClient(url string, privateKey string, bridge, erc20 common.Address, log log.Logger) (*Client, error) {
@@ -51,8 +52,8 @@ func NewClient(url string, privateKey string, bridge, erc20 common.Address, log 
 	return &Client{
 		client: client,
 		bridge: bridge,
-		erc20: erc20,
-		log: log,
+		erc20:  erc20,
+		log:    log,
 	}, nil
 }
 
@@ -61,7 +62,7 @@ func (c *Client) GetBalance(addr string) (*big.Int, error) {
 }
 
 func (c *Client) CreateFungibleDeposit(amount *big.Int, recipient []byte, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, *big.Int, error) {
-	data := utils.ConstructErc20DepositData(rId, recipient, amount)
+	data := utils.ConstructErc20DepositData(recipient, amount)
 
 	bridgeInstance, err := Bridge.NewBridge(c.bridge, c.client.Client)
 	if err != nil {
@@ -112,14 +113,8 @@ func (c *Client) parseDepositNonce(receipt *ethtypes.Receipt) (msg.Nonce, error)
 	return 0, fmt.Errorf("deposit event not found for tx %s", receipt.TxHash.Hex())
 }
 
-func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient []byte, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int) error {
-	// wait for proposal created event
-	_, err := c.WaitForEvent(utils.ProposalCreated, startBlock, nonce, source)
-	if err != nil {
-		return err
-	}
-	// assert execution event
-	tx, err := c.WaitForEvent(utils.ProposalFinalized, startBlock, nonce, source)
+func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int) error {
+	tx, err := c.WaitForEvent(utils.ProposalExecuted, startBlock, nonce, source)
 	if err != nil {
 		return err
 	}
@@ -129,52 +124,59 @@ func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient []byte, sourc
 	if err != nil {
 		return err
 	}
+
+	if receipt.Status != 1 {
+		return fmt.Errorf("execution of proposal failed. tx: %s", receipt.TxHash.Hex())
+	}
+
 	for _, evt := range receipt.Logs {
 		if evt.Topics[0] == Erc20TransferEvent.GetTopic() {
-			if isExpectedErc20Event(*evt, amount, recipient) {
+			ok, err := isExpectedErc20Event(*evt, amount, recipient)
+			if err != nil {
+				return err
+			} else if ok {
 				return nil
 			}
 		}
 	}
 
-	return fmt.Errorf("transfer event not found for tx %s", tx)
+	return fmt.Errorf("transfer event not found for tx %s", tx.Hex())
 
 }
 
-// TODO: Copied from e2e
 func (c *Client) WaitForEvent(event utils.EventSig, startBlock *big.Int, nonce msg.Nonce, source msg.ChainId) (common.Hash, error) {
-	query := ethereum.FilterQuery{
-		FromBlock: startBlock,
-		Addresses: []common.Address{c.bridge},
-		Topics: [][]common.Hash{
-			{event.GetTopic()},
-		},
+	currentBlock := startBlock
+	for retry := 0; retry < BlockRetryLimit; retry++ {
+
+		err := c.WaitForBlock(currentBlock)
+		if err != nil {
+			return common.Hash{}, nil
+		}
+
+		query := ethereum.FilterQuery{
+			FromBlock: currentBlock,
+			ToBlock:   currentBlock,
+			Addresses: []common.Address{c.bridge},
+			Topics: [][]common.Hash{
+				{event.GetTopic()},
+			},
+		}
+
+		evts, err := c.client.Client.FilterLogs(context.Background(), query)
+		if err != nil {
+			return common.Hash{}, err
+		}
+
+		for _, evt := range evts {
+			if isExpectedEvent(evt, nonce, source) {
+				return evt.TxHash, nil
+			}
+		}
+
+		currentBlock.Add(currentBlock, big.NewInt(1))
 	}
 
-	ch := make(chan ethtypes.Log)
-	sub, err := c.client.Client.SubscribeFilterLogs(context.Background(), query, ch)
-	if err != nil {
-		return common.Hash{}, err
-	}
-	defer sub.Unsubscribe()
-	timeout := time.After(EventTimeout)
-	for {
-		select {
-		case evt := <-ch:
-			if isExpectedEvent(evt, nonce, source) {
-				log.Info("Got matching event, continuing...", "event", event, "topics", evt.Topics)
-				return evt.TxHash, nil
-			} else {
-				log.Trace("Incorrect event params", "event", event, "topics", evt.Topics)
-			}
-		case err := <-sub.Err():
-			if err != nil {
-				return common.Hash{}, err
-			}
-		case <-timeout:
-			return common.Hash{}, fmt.Errorf("test timed out waiting for event %s", event)
-		}
-	}
+	return common.Hash{}, fmt.Errorf("retries exceeded waiting for event")
 }
 
 func isExpectedEvent(evt ethtypes.Log, expectedNonce msg.Nonce, expectedSourceId msg.ChainId) bool {
@@ -191,19 +193,18 @@ func isExpectedEvent(evt ethtypes.Log, expectedNonce msg.Nonce, expectedSourceId
 	return true
 }
 
-func isExpectedErc20Event(evt ethtypes.Log, expectedAmount *big.Int, expectedRecipient []byte) bool {
-	recipient := evt.Topics[2].Bytes()
-	amount := evt.Topics[3].Big()
-
-	if !bytes.Equal(recipient, expectedRecipient) {
-		return false
+func isExpectedErc20Event(evt ethtypes.Log, expectedAmount *big.Int, expectedRecipient string) (bool, error) {
+	recipient := common.BigToAddress(evt.Topics[2].Big()).Hex()
+	if recipient != expectedRecipient {
+		return false, fmt.Errorf("recipient does not match expected. Actual: %s, Expected: %s", recipient, expectedRecipient)
 	}
 
+	amount := big.NewInt(0).SetBytes(evt.Data)
 	if amount.Cmp(expectedAmount) != 0 {
-		return false
+		return false, fmt.Errorf("amount does not match expected. Actual: %s, Expected: %s", amount.String(), expectedAmount.String())
 	}
 
-	return true
+	return true, nil
 }
 
 func (c *Client) Close() {
@@ -229,6 +230,7 @@ func WaitForTx(client *utils.Client, tx *ethtypes.Transaction) (*ethtypes.Receip
 	}
 	return nil, fmt.Errorf("failed to wait for tx")
 }
+
 
 func (c *Client) WaitForBlock(block *big.Int) error {
 	for {

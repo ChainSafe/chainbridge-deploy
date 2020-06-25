@@ -13,13 +13,13 @@ type TestType string
 var FungibleTest TestType = "fungible"
 
 type Test struct {
-	Type TestType
-	Recipient []byte
-	Amount *big.Int
+	Type       TestType
+	Recipient  []byte
+	Amount     *big.Int
 	ResourceId msg.ResourceId
 
 	// For ETH chains only
-	SourceContract string
+	SourceContract      string
 	DestinationContract string
 }
 
