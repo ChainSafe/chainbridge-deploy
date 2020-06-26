@@ -57,14 +57,13 @@ const depositCmd = new Command("deposit")
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
 
         const data = '0x' +
-            args.resourceId.substr(2) +              // OriginHandlerAddress  (32 bytes)
-            ethers.utils.hexZeroPad(ethers.utils.hexlify(Number(args.amount)), 32).substr(2) +    // Deposit Amount        (32 bytes)
+            ethers.utils.hexZeroPad(ethers.utils.bigNumberify(args.amount).toHexString(), 32).substr(2) +    // Deposit Amount        (32 bytes)
             ethers.utils.hexZeroPad(ethers.utils.hexlify((args.recipient.length - 2)/2), 32).substr(2) +    // len(recipientAddress) (32 bytes)
             args.recipient.substr(2);                    // recipientAddress      (?? bytes)
 
         log(args, `Constructed deposit:`)
         log(args, `  Resource Id: ${args.resourceId}`)
-        log(args, `  Amount: ${args.amount}`)
+        log(args, `  Amount: ${ethers.utils.bigNumberify(args.amount).toHexString()}`)
         log(args, `  len(recipient): ${(args.recipient.length - 2)/ 2}`)
         log(args, `  Recipient: ${args.recipient}`)
         log(args, `  Raw: ${data}`)
@@ -93,6 +92,43 @@ const balanceCmd = new Command("balance")
         log(args, `Account ${args.address} has a balance of ${balance}` )
     })
 
+const allowanceCmd = new Command("allowance")
+    .description("Get the allowance of a spender for an address")
+    .option('--spender <address>', 'Address of spender', constants.ERC20_HANDLER_ADDRESS)
+    .option('--owner <address>', 'Address of token owner', constants.deployerAddress)
+    .option('--erc20Address <address>', 'ERC20 contract address', constants.ERC20_ADDRESS)
+    .action(async function(args) {
+        await setupParentArgs(args, args.parent.parent)
+
+        const erc20Instance = new ethers.Contract(args.erc20Address, constants.ContractABIs.Erc20Mintable.abi, args.wallet);
+        const allowance = await erc20Instance.allowance(args.owner, args.spender)
+
+        log(args, `Spender ${args.spender} is allowed to spend ${allowance} tokens on behalf of ${args.owner}`)
+    })
+
+const createErc20ProposalData = (amount, recipient) => {
+        if (recipient.substr(0, 2) === "0x") {
+                recipient = recipient.substr(2)
+        }
+        return '0x' +
+            ethers.utils.hexZeroPad(ethers.utils.bigNumberify(amount).toHexString(), 32).substr(2) +
+            ethers.utils.hexZeroPad(ethers.utils.hexlify(recipient.length / 2 + recipient.length % 2), 32).substr(2) +
+            recipient;
+}
+
+const proposalDataHashCmd = new Command("data-hash")
+    .description("Hash the proposal data for an erc20 proposal")
+    .option('--amount <value>', "Amount to transfer", 1)
+    .option('--recipient <address>', 'Destination recipient address', constants.relayerAddresses[4])
+    .option('--handler <address>', 'ERC20 handler  address', constants.ERC20_HANDLER_ADDRESS)
+    .action(async function(args) {
+
+        const data = createErc20ProposalData(args.amount, args.recipient)
+        const hash = ethers.utils.solidityKeccak256(["address", "bytes"], [args.handler, data])
+
+        log(args, `Hash: ${hash} Data: ${data}`)
+    })
+
 const erc20Cmd = new Command("erc20")
 
 erc20Cmd.addCommand(mintCmd)
@@ -100,5 +136,7 @@ erc20Cmd.addCommand(addMinterCmd)
 erc20Cmd.addCommand(approveCmd)
 erc20Cmd.addCommand(depositCmd)
 erc20Cmd.addCommand(balanceCmd)
+erc20Cmd.addCommand(allowanceCmd)
+erc20Cmd.addCommand(proposalDataHashCmd)
 
 module.exports = erc20Cmd

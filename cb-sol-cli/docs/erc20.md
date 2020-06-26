@@ -5,6 +5,8 @@
 - [`approve`](#approve)
 - [`deposit`](#deposit)
 - [`balance`](#balance)
+- [`allowance`](#allowance)
+- [`data-hash`](#data-hash)
 
 ## `mint`
 Mint tokens on an ERC20 mintable contract.
@@ -45,4 +47,22 @@ Query balance for an account in an ERC20 contract.
 ```
   --address <address>       Address to query
   --erc20Address <address>  ERC20 contract address
+```
+
+## `allowance`
+Get the allowance of a spender for an address
+
+```
+  --spender <address>       Address of spender
+  --owner <address>         Address of token owner
+  --erc20Address <address>  ERC20 contract address
+```
+
+## `data-hash`
+Constructs proposal data and returns the hash required for on-chain queries.
+
+```
+  --amount <value>       Amount to transfer
+  --recipient <address>  Destination recipient address 
+  --handler <address>    ERC20 handler  address
 ```
