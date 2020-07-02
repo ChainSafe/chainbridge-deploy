@@ -27,6 +27,7 @@ func (t *Test) Run(source, dest Chain) error {
 	if t.Type == FungibleTest {
 		log.Info("Starting fungible test")
 		nonce, block, err := source.Client.CreateFungibleDeposit(t.Amount, t.Recipient, t.ResourceId, dest.ChainId)
+
 		if err != nil {
 			return err
 		}
@@ -38,7 +39,7 @@ func (t *Test) Run(source, dest Chain) error {
 		}
 
 		log.Info("Verifying fungible proposal")
-		err = dest.Client.VerifyFungibleProposal(t.Amount, t.Recipient, source.ChainId, nonce, block, status)
+		err = dest.Client.VerifyFungibleProposal(t.Amount, t.Recipient, source.ChainId, nonce, block)
 		if err != nil {
 			return err
 		}

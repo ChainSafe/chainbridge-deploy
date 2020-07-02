@@ -34,7 +34,7 @@ func (c *Client) CreateFungibleDeposit(amount *big.Int, recipient string, rId ms
 	panic("not implemented")
 }
 
-func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int, status *big.Int) error {
+func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int) error {
 	panic("not implemented")
 }
 

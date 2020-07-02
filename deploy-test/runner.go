@@ -12,7 +12,7 @@ import (
 
 type Client interface {
 	CreateFungibleDeposit(amount *big.Int, recipient string, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, *big.Int, error)
-	VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int, status *big.Int) error
+	VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int) error
 	WaitForBlock(block *big.Int) error
 	Close()
 }

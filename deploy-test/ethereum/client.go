@@ -106,8 +106,9 @@ func (c *Client) parseDepositNonce(receipt *ethtypes.Receipt) (msg.Nonce, error)
 }
 
 // VerifyFungibleProposal waits for the proposal to be finalized, then verifies the resulting ERC20 Transfer event
-func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int, status *big.Int) error {
-	tx, err := c.WaitForEvent(startBlock, nonce, source, status)
+func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int) error {
+	// Waiting for the proposal to be executed
+	tx, err := c.WaitForEvent(startBlock, nonce, source, big.NewInt(3))
 	if err != nil {
 		return err
 	}
