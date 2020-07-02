@@ -63,19 +63,20 @@ func constructErc20ProposalData(amount []byte, recipient []byte) []byte {
 
 //TODO: REMOVE
 func watchEvent(client *utils.Client, bridge common.Address, subStr utils.EventSig) {
-	fmt.Printf("Watching for event: %s\n", subStr)
+	fmt.Printf("Watching for event: %s\n")
+
 	query := ethereum.FilterQuery{
 		FromBlock: big.NewInt(0),
 		Addresses: []common.Address{bridge},
 		Topics: [][]common.Hash{
-			{subStr.GetTopic()},
+			{utils.ProposalEvent.GetTopic()},
 		},
 	}
 
 	ch := make(chan ethtypes.Log)
 	sub, err := client.Client.SubscribeFilterLogs(context.Background(), query, ch)
 	if err != nil {
-		log.Error("Failed to subscribe to event", "event", subStr)
+		log.Error("Failed to subscribe to event", "event")
 		return
 	}
 	defer sub.Unsubscribe()
@@ -83,11 +84,11 @@ func watchEvent(client *utils.Client, bridge common.Address, subStr utils.EventS
 	for {
 		select {
 		case evt := <-ch:
-			fmt.Printf("%s (block: %d): %#v\n", subStr, evt.BlockNumber, evt.Topics)
+			fmt.Printf("(block: %d): %#v\n", evt.BlockNumber, evt.Topics)
 
 		case err := <-sub.Err():
 			if err != nil {
-				log.Error("Subscription error", "event", subStr, "err", err)
+				log.Error("Subscription error", "event", "err", err)
 				return
 			}
 		}
