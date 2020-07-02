@@ -19,6 +19,7 @@ type Test struct {
 	ResourceId msg.ResourceId
 
 	// For ETH chains only
+	Status *big.Int
 	SourceContract      string
 	DestinationContract string
 }
@@ -38,7 +39,7 @@ func (t *Test) Run(source, dest Chain) error {
 		}
 
 		log.Info("Verifying fungible proposal")
-		err = dest.Client.VerifyFungibleProposal(t.Amount, t.Recipient, source.ChainId, nonce, block)
+		err = dest.Client.VerifyFungibleProposal(t.Amount, t.Recipient, source.ChainId, nonce, block, )
 		if err != nil {
 			return err
 		}

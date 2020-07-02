@@ -139,7 +139,7 @@ func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient string, sourc
 
 // WaitForEvent will wait for some event on the bridge contract.
 // Note: Expects the nonce and source ID to be part of the event being watched.
-func (c *Client) WaitForEvent(event utils.EventSig, startBlock *big.Int, nonce msg.Nonce, source msg.ChainId, status *big.Int) (common.Hash, error) {
+func (c *Client) WaitForEvent(startBlock *big.Int, nonce msg.Nonce, source msg.ChainId, status *big.Int) (common.Hash, error) {
 	currentBlock := startBlock
 	for retry := 0; retry < BlockRetryLimit; retry++ {
 
@@ -153,7 +153,7 @@ func (c *Client) WaitForEvent(event utils.EventSig, startBlock *big.Int, nonce m
 			ToBlock:   currentBlock,
 			Addresses: []common.Address{c.bridge},
 			Topics: [][]common.Hash{
-				{event.GetTopic()},
+				{utils.ProposalEvent.GetTopic()},
 			},
 		}
 
