@@ -179,6 +179,7 @@ func TestClient_VerifyFungibleProposal(t *testing.T) {
 	srcId := msg.ChainId(0)
 	destId := msg.ChainId(1)
 	nonce := msg.Nonce(1)
+	status := big.NewInt(1)
 	recipient := AliceKp.CommonAddress()
 
 	// Deploy contracts
@@ -199,7 +200,7 @@ func TestClient_VerifyFungibleProposal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	go watchEvent(client.client, contracts.BridgeAddress, utils.ProposalCreated)
+	go watchEvent(client.client, contracts.BridgeAddress, utils.ProposalEvent)
 	startBlock, err := client.client.Client.BlockByNumber(context.Background(), nil)
 	if err != nil {
 		t.Fatal(err)
@@ -210,7 +211,7 @@ func TestClient_VerifyFungibleProposal(t *testing.T) {
 	voteOnErc20Proposal(t, testClient, contracts.BridgeAddress, srcId, nonce, rId, utils.Hash(append(contracts.ERC20HandlerAddress.Bytes(), data...)))
 	executeErc20Proposal(t, testClient, contracts.BridgeAddress, srcId, nonce, data, rId)
 
-	err = client.VerifyFungibleProposal(amount, recipient.String(), srcId, nonce, startBlock.Number())
+	err = client.VerifyFungibleProposal(amount, recipient.String(), srcId, nonce, startBlock.Number(), status)
 	if err != nil {
 		t.Fatal(err)
 	}

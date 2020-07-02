@@ -12,15 +12,20 @@ import (
 
 var Erc20TransferEvent utils.EventSig = "Transfer(address,address,uint256)"
 
-func isExpectedEvent(evt ethtypes.Log, expectedNonce msg.Nonce, expectedSourceId msg.ChainId) bool {
+func isExpectedEvent(evt ethtypes.Log, expectedNonce msg.Nonce, expectedSourceId msg.ChainId, expectedStatus *big.Int) bool {
 	sourceId := evt.Topics[1].Big()
-	nonce := evt.Topics[3].Big()
+	nonce := evt.Topics[2].Big()
+	status := evt.Topics[3].Big()
 
 	if nonce.Cmp(big.NewInt(int64(expectedNonce))) != 0 {
 		return false
 	}
 
 	if sourceId.Cmp(big.NewInt(int64(expectedSourceId))) != 0 {
+		return false
+	}
+
+	if status.Cmp(expectedStatus) != 0{
 		return false
 	}
 	return true

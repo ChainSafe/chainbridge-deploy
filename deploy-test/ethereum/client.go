@@ -106,8 +106,8 @@ func (c *Client) parseDepositNonce(receipt *ethtypes.Receipt) (msg.Nonce, error)
 }
 
 // VerifyFungibleProposal waits for the proposal to be finalized, then verifies the resulting ERC20 Transfer event
-func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int) error {
-	tx, err := c.WaitForEvent(utils.ProposalExecuted, startBlock, nonce, source)
+func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int, status *big.Int) error {
+	tx, err := c.WaitForEvent(utils.ProposalEvent, startBlock, nonce, source, status)
 	if err != nil {
 		return err
 	}
@@ -139,7 +139,7 @@ func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient string, sourc
 
 // WaitForEvent will wait for some event on the bridge contract.
 // Note: Expects the nonce and source ID to be part of the event being watched.
-func (c *Client) WaitForEvent(event utils.EventSig, startBlock *big.Int, nonce msg.Nonce, source msg.ChainId) (common.Hash, error) {
+func (c *Client) WaitForEvent(event utils.EventSig, startBlock *big.Int, nonce msg.Nonce, source msg.ChainId, status *big.Int) (common.Hash, error) {
 	currentBlock := startBlock
 	for retry := 0; retry < BlockRetryLimit; retry++ {
 
@@ -163,7 +163,7 @@ func (c *Client) WaitForEvent(event utils.EventSig, startBlock *big.Int, nonce m
 		}
 
 		for _, evt := range evts {
-			if isExpectedEvent(evt, nonce, source) {
+			if isExpectedEvent(evt, nonce, source, status) {
 				return evt.TxHash, nil
 			}
 		}
