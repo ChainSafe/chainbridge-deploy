@@ -18,3 +18,6 @@ build:
 
 clean:
 	rm -rf build/
+
+docker-e2e:
+	docker-compose -f ./docker-compose-e2e.yml up -V
