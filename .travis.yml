@@ -32,9 +32,3 @@ jobs:
     - name: "Deploy Tester Tests"
       language: go
       go: 1.13.x
-      script:
-        - set -e
-        - docker-compose -f ./docker-compose-e2e.yml up -V
-        - docker ps
-        - travis_wait 30 cd deploy-test
-        - make test
