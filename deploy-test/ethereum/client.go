@@ -209,7 +209,7 @@ func (c *Client) WaitForBlock(block *big.Int) error {
 			if currBlock.Number().Cmp(block) >= 0 {
 				return nil
 			}
-			c.log.Trace("Block not ready, waiting", "target", block, "current", currBlock)
+			c.log.Trace("Block not ready, waiting", "target", block, "current", currBlock.Number())
 			time.Sleep(BlockRetryInterval)
 			continue
 		}

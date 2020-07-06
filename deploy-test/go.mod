@@ -7,4 +7,6 @@ require (
 	github.com/ChainSafe/log15 v1.0.0
 	github.com/ethereum/go-ethereum v1.9.13
 	github.com/status-im/keycard-go v0.0.0-20190316090335-8537d3370df4
+	github.com/stretchr/testify v1.4.0
+	github.com/urfave/cli/v2 v2.2.0
 )
