@@ -13,3 +13,6 @@ test:
 
 build:
 	cd cmd/ && go build -o ../build/deploy-test
+
+docker-test:
+	./docker/run_geth_and_relayers.sh
