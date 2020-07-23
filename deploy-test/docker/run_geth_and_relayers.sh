@@ -8,7 +8,7 @@ CONTRACTS="--bridge --erc20Handler --erc721Handler --genericHandler"
 docker-compose -f ./docker/docker-compose-2-geth.yml up -d -V
 
 # Cleanup geth when scipt is terminated
-trap "docker-compose -f ./docker/docker-compose-2-geth.yml down; exit" SIGHUP SIGINT SIGTERM
+trap "docker-compose -f ./docker/docker-compose-2-geth.yml down; exit" EXIT
 
 # Deploy contracts
 cb-sol-cli deploy $CONTRACTS

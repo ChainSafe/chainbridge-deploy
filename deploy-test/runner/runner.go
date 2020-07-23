@@ -12,7 +12,7 @@ import (
 
 type Client interface {
 	CreateFungibleDeposit(amount *big.Int, recipient string, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, *big.Int, error)
-	VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce, startBlock *big.Int) error
+	VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce) error
 	WaitForBlock(block *big.Int) error
 	Close()
 }
@@ -26,7 +26,7 @@ func Start(cfg *Config) ([]TestFailure, error) {
 	// Initialize clients
 	var err error
 	if cfg.Source.Type == EthereumType {
-		cfg.Source.Client, err = ethereum.NewClient(cfg.Source.Endpoint, cfg.Source.PrivateKey, cfg.Source.Bridge, cfg.Source.Erc20, log.New("chain", "source"))
+		cfg.Source.Client, err = ethereum.NewClient(cfg.Source.Endpoint, cfg.Source.PrivateKey, cfg.Source.Bridge, cfg.Source.Erc20, cfg.Source.Erc20Handler, log.New("chain", "source"))
 	} else if cfg.Source.Type == SubstrateType {
 		cfg.Source.Client, err = substrate.NewClient(cfg.Source.Endpoint, cfg.Source.PrivateKey)
 	} else {
@@ -38,7 +38,7 @@ func Start(cfg *Config) ([]TestFailure, error) {
 	}
 
 	if cfg.Destination.Type == EthereumType {
-		cfg.Destination.Client, err = ethereum.NewClient(cfg.Destination.Endpoint, cfg.Source.PrivateKey, cfg.Destination.Bridge, cfg.Destination.Erc20, log.New("chain", "dest"))
+		cfg.Destination.Client, err = ethereum.NewClient(cfg.Destination.Endpoint, cfg.Source.PrivateKey, cfg.Destination.Bridge, cfg.Destination.Erc20, cfg.Destination.Erc20Handler, log.New("chain", "dest"))
 	} else if cfg.Destination.Type == SubstrateType {
 		cfg.Destination.Client, err = substrate.NewClient(cfg.Destination.Endpoint, cfg.Source.PrivateKey)
 	} else {

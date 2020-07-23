@@ -62,9 +62,7 @@ func constructErc20ProposalData(amount []byte, recipient []byte) []byte {
 }
 
 //TODO: REMOVE
-func watchEvent(client *utils.Client, bridge common.Address) {
-	fmt.Printf("Watching for event:")
-
+func watchForProposalEvent(client *utils.Client, bridge common.Address) {
 	query := ethereum.FilterQuery{
 		FromBlock: big.NewInt(0),
 		Addresses: []common.Address{bridge},
@@ -160,7 +158,7 @@ func TestClient_CreateFungibleDeposit(t *testing.T) {
 	ethtest.RegisterResource(t, testClient, contracts.BridgeAddress, contracts.ERC20HandlerAddress, rId, erc20Contract)
 
 	// Create client
-	client, err := NewClient(TestEndpoint, AlicePrivKey, contracts.BridgeAddress, erc20Contract, log.Root())
+	client, err := NewClient(TestEndpoint, AlicePrivKey, contracts.BridgeAddress, erc20Contract, contracts.ERC20HandlerAddress, log.Root())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -196,11 +194,11 @@ func TestClient_VerifyFungibleProposal(t *testing.T) {
 	ethtest.RegisterResource(t, testClient, contracts.BridgeAddress, contracts.ERC20HandlerAddress, rId, erc20Contract)
 	ethtest.SetBurnable(t, testClient, contracts.BridgeAddress, contracts.ERC20HandlerAddress, erc20Contract)
 	// Create client
-	client, err := NewClient(TestEndpoint, AlicePrivKey, contracts.BridgeAddress, erc20Contract, log.Root())
+	client, err := NewClient(TestEndpoint, AlicePrivKey, contracts.BridgeAddress, erc20Contract, contracts.ERC20HandlerAddress, log.Root())
 	if err != nil {
 		t.Fatal(err)
 	}
-	go watchEvent(client.client, contracts.BridgeAddress)
+	go watchForProposalEvent(client.client, contracts.BridgeAddress)
 	startBlock, err := client.client.Client.BlockByNumber(context.Background(), nil)
 	if err != nil {
 		t.Fatal(err)

@@ -12,6 +12,9 @@ type TestType string
 
 var FungibleTest TestType = "fungible"
 
+// The number of blocks relayers wait before processing a deposit
+const BlockWait = 10
+
 type Test struct {
 	Type       TestType       `json:"type"`
 	Recipient  string         `json:"recipient"`
@@ -26,20 +29,14 @@ type Test struct {
 func (t *Test) Run(source, dest Chain) error {
 	if t.Type == FungibleTest {
 		log.Info("Starting fungible test")
-		nonce, block, err := source.Client.CreateFungibleDeposit(t.Amount, t.Recipient, t.ResourceId, dest.ChainId)
+		nonce, _, err := source.Client.CreateFungibleDeposit(t.Amount, t.Recipient, t.ResourceId, dest.ChainId)
 
-		if err != nil {
-			return err
-		}
-
-		log.Info("Waiting for block", "target", block.String())
-		err = source.Client.WaitForBlock(block)
 		if err != nil {
 			return err
 		}
 
 		log.Info("Verifying fungible proposal")
-		err = dest.Client.VerifyFungibleProposal(t.Amount, t.Recipient, source.ChainId, nonce, block)
+		err = dest.Client.VerifyFungibleProposal(t.Amount, t.Recipient, source.ChainId, nonce)
 		if err != nil {
 			return err
 		}

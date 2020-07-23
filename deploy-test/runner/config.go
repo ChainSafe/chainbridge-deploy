@@ -28,6 +28,7 @@ type Chain struct {
 	// Optional ethereum fields
 	Bridge   common.Address `json:"bridge"`
 	Erc20    common.Address `json:"erc20"`
+	Erc20Handler    common.Address `json:"erc20Handler"`
 	Client   Client
 }
 
