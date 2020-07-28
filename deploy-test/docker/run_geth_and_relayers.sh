@@ -11,8 +11,8 @@ docker-compose -f ./docker/docker-compose-2-geth.yml up -d -V
 trap "docker-compose -f ./docker/docker-compose-2-geth.yml down; exit" EXIT
 
 # Deploy contracts
-cb-sol-cli deploy $CONTRACTS
-cb-sol-cli --url http://localhost:8546 deploy $CONTRACTS
+cb-sol-cli deploy $CONTRACTS --chainId 1
+cb-sol-cli --url http://localhost:8546 deploy $CONTRACTS --chainId 2
 
 # Start relayers
 docker-compose -f ./docker/docker-compose-3-relayers.yml up -V

@@ -8,17 +8,17 @@ import (
 	"testing"
 
 	"github.com/ChainSafe/ChainBridge/keystore"
-	msg "github.com/ChainSafe/ChainBridge/message"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/require"
 )
 
 var exampleEthAddr = common.HexToAddress("0xD0c63e1f2E89B1316053De242456AC56eF2B9A0D")
+var exampleRId = "0x0000000000000000000000D0c63e1f2E89B1316053De242456AC56eF2B9A0D"
 var AliceEthKp = keystore.TestKeyRing.EthereumKeys[keystore.AliceKey]
 var AliceSubKp = keystore.TestKeyRing.SubstrateKeys[keystore.AliceKey]
 
 var exampleConfig = Config{
-	Source:      Chain{
+	Source: Chain{
 		PrivateKey: AliceEthKp.CommonAddress().String(),
 		Type:       "ethereum",
 		Endpoint:   "http://localhost:8545",
@@ -32,13 +32,12 @@ var exampleConfig = Config{
 		Endpoint:   "http://localhost:9944",
 		ChainId:    1,
 	},
-	Tests:       []Test{
+	Tests: []Test{
 		{
-			Type:           "fungible",
-			Recipient:      AliceSubKp.PublicKey(),
-			Amount:         big.NewInt(100),
-			ResourceId:     msg.ResourceIdFromSlice(exampleEthAddr.Bytes()),
-			SourceContract: exampleEthAddr.String(),
+			Type:       "fungible",
+			Recipient:  AliceSubKp.PublicKey(),
+			Amount:     big.NewInt(100),
+			ResourceId: exampleRId,
 		},
 	},
 }

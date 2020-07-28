@@ -20,32 +20,30 @@ var transferAmount = big.NewInt(100)
 
 func createEthEthConfig(ethABridge, ethAErc20, ethAErc20Handler, ethBBridge, ethBErc20, ethBErc20Handler common.Address, rId msg.ResourceId) *Config {
 	return &Config{
-		Source:      Chain{
-			PrivateKey: hexutils.BytesToHex(AliceEthKp.Encode()),
-			Type:       "ethereum",
-			Endpoint:   EthAEndpoint,
-			ChainId:    1,
-			Bridge:     ethABridge,
-			Erc20:      ethAErc20,
+		Source: Chain{
+			PrivateKey:   hexutils.BytesToHex(AliceEthKp.Encode()),
+			Type:         "ethereum",
+			Endpoint:     EthAEndpoint,
+			ChainId:      1,
+			Bridge:       ethABridge,
+			Erc20:        ethAErc20,
 			Erc20Handler: ethAErc20Handler,
 		},
 		Destination: Chain{
-			PrivateKey: hexutils.BytesToHex(AliceEthKp.Encode()),
-			Type:       "ethereum",
-			Endpoint:   EthBEndpoint,
-			ChainId:    2,
-			Bridge:     ethBBridge,
-			Erc20:      ethBErc20,
+			PrivateKey:   hexutils.BytesToHex(AliceEthKp.Encode()),
+			Type:         "ethereum",
+			Endpoint:     EthBEndpoint,
+			ChainId:      2,
+			Bridge:       ethBBridge,
+			Erc20:        ethBErc20,
 			Erc20Handler: ethBErc20Handler,
 		},
-		Tests:       []Test{
+		Tests: []Test{
 			{
-				Type:                FungibleTest,
-				Recipient:           ethRecipient.Hex(),
-				Amount:              transferAmount,
-				ResourceId:          rId,
-				SourceContract:      ethAErc20.Hex(),
-				DestinationContract: ethBErc20.Hex(),
+				Type:       FungibleTest,
+				Recipient:  ethRecipient.Hex(),
+				Amount:     transferAmount,
+				ResourceId: hexutils.BytesToHex(rId[:]),
 			},
 		},
 	}
@@ -82,6 +80,6 @@ func Test_RunnerEthEth(t *testing.T) {
 	}
 
 	if len(res) > 0 {
-		t.Fatalf("runner reported failed test: %s", res[0].err)
+		t.Fatalf("runner reported failed test: %s", res[0].Err)
 	}
 }

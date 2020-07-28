@@ -11,15 +11,16 @@ import (
 )
 
 type Client interface {
-	CreateFungibleDeposit(amount *big.Int, recipient string, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, *big.Int, error)
+	CreateFungibleDeposit(amount *big.Int, recipient string, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, error)
 	VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce) error
 	WaitForBlock(block *big.Int) error
 	Close()
 }
 
 type TestFailure struct {
-	err   error
-	index int
+	Err       error
+	Iteration int
+	Index     int
 }
 
 func Start(cfg *Config) ([]TestFailure, error) {
@@ -50,13 +51,21 @@ func Start(cfg *Config) ([]TestFailure, error) {
 	}
 
 	var fails []TestFailure
-	for i, t := range cfg.Tests {
-		err := t.Run(cfg.Source, cfg.Destination)
-		if err != nil {
-			log.Error("Test failed", "err", err)
-			fails = append(fails, TestFailure{err: err, index: i})
+	for iter := 0; iter < cfg.Iterations; iter++ {
+		log.Info(fmt.Sprintf("Running iteration %d of %d", iter+1, cfg.Iterations))
+		for i, t := range cfg.Tests {
+			log.Info(fmt.Sprintf("Running test %d of %d", i+1, len(cfg.Tests)),
+				"src", cfg.Source.ChainId, "dest", cfg.Destination.ChainId, "amount", t.Amount.String(), "recipient", t.Recipient)
+			err := t.Run(cfg.Source, cfg.Destination)
+			if err != nil {
+				log.Error("Test failed", "err", err)
+				fails = append(fails, TestFailure{Err: err, Iteration: iter, Index: i})
+			} else {
+				log.Info("Test passed.")
+			}
 		}
 	}
 
+	log.Info("Tests finished.")
 	return fails, nil
 }

@@ -30,7 +30,7 @@ func (c *Client) GetBalance(addr string) (*big.Int, error) {
 	panic("not implemented")
 }
 
-func (c *Client) CreateFungibleDeposit(amount *big.Int, recipient string, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, *big.Int, error) {
+func (c *Client) CreateFungibleDeposit(amount *big.Int, recipient string, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, error) {
 	panic("not implemented")
 }
 

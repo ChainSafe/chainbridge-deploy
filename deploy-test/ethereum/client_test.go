@@ -22,10 +22,8 @@ var TestEndpoint = "ws://localhost:8545"
 var AliceKp = keystore.TestKeyRing.EthereumKeys[keystore.AliceKey]
 var AlicePrivKey = hexutils.BytesToHex(AliceKp.Encode())
 
-func verifyDepositEvent(t *testing.T, client *utils.Client, block *big.Int, bridge common.Address, expectedNonce msg.Nonce) {
+func verifyDepositEvent(t *testing.T, client *utils.Client, bridge common.Address, expectedNonce msg.Nonce) {
 	query := ethereum.FilterQuery{
-		FromBlock: block,
-		ToBlock:   block,
 		Addresses: []common.Address{bridge},
 		Topics: [][]common.Hash{
 			{utils.Deposit.GetTopic()},
@@ -164,13 +162,13 @@ func TestClient_CreateFungibleDeposit(t *testing.T) {
 	}
 	// Create deposit
 
-	nonce, blockNum, err := client.CreateFungibleDeposit(amount, AliceKp.CommonAddress().Hex(), rId, destId)
+	nonce, err := client.CreateFungibleDeposit(amount, AliceKp.CommonAddress().Hex(), rId, destId)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Verify deposit
-	verifyDepositEvent(t, testClient, blockNum, contracts.BridgeAddress, nonce)
+	verifyDepositEvent(t, testClient, contracts.BridgeAddress, nonce)
 }
 
 func TestClient_VerifyFungibleProposal(t *testing.T) {

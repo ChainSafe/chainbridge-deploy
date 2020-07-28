@@ -6,36 +6,31 @@ import (
 
 	msg "github.com/ChainSafe/ChainBridge/message"
 	log "github.com/ChainSafe/log15"
+	"github.com/status-im/keycard-go/hexutils"
 )
 
 type TestType string
 
 var FungibleTest TestType = "fungible"
 
-// The number of blocks relayers wait before processing a deposit
-const BlockWait = 10
-
 type Test struct {
-	Type       TestType       `json:"type"`
-	Recipient  string         `json:"recipient"`
-	Amount     *big.Int       `json:"amount"`
-	ResourceId msg.ResourceId `json:"resourceId"`
-
-	// For ETH chains only
-	SourceContract      string `json:"sourceContract"`
-	DestinationContract string `json:"destinationContract"`
+	Type       TestType `json:"type"`
+	Recipient  string   `json:"recipient"`
+	Amount     *big.Int `json:"amount"`
+	ResourceId string   `json:"resourceId"`
 }
 
 func (t *Test) Run(source, dest Chain) error {
-	if t.Type == FungibleTest {
-		log.Info("Starting fungible test")
-		nonce, _, err := source.Client.CreateFungibleDeposit(t.Amount, t.Recipient, t.ResourceId, dest.ChainId)
+	rId := msg.ResourceIdFromSlice(hexutils.HexToBytes(t.ResourceId))
 
+	if t.Type == FungibleTest {
+		log.Debug("Creating fungible deposit", "src", source.ChainId, "dest", dest.ChainId, "amount", t.Amount.String(), "recipient", t.Recipient)
+		nonce, err := source.Client.CreateFungibleDeposit(t.Amount, t.Recipient, rId, dest.ChainId)
 		if err != nil {
 			return err
 		}
 
-		log.Info("Verifying fungible proposal")
+		log.Debug("Verifying fungible proposal", "src", source.ChainId, "dest", dest.ChainId, "amount", t.Amount.String(), "nonce", nonce)
 		err = dest.Client.VerifyFungibleProposal(t.Amount, t.Recipient, source.ChainId, nonce)
 		if err != nil {
 			return err

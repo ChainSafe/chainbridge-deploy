@@ -2,13 +2,14 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/ChainSafe/chainbridge-deploy/deploy-test/runner"
 	log "github.com/ChainSafe/log15"
 	"github.com/urfave/cli/v2"
 )
-
 
 var app = cli.NewApp()
 
@@ -18,13 +19,32 @@ func init() {
 	app.Name = "deploy-test"
 	app.Usage = "deploy-test [config]"
 	app.EnableBashCompletion = true
+	app.Flags = cliFlags
+}
+
+func startLogger(ctx *cli.Context) error {
+	logger := log.Root()
+	handler := logger.GetHandler()
+	var lvl log.Lvl
+
+	if lvlToInt, err := strconv.Atoi(ctx.String(verbosityFlag.Name)); err == nil {
+		lvl = log.Lvl(lvlToInt)
+	} else if lvl, err = log.LvlFromString(ctx.String(verbosityFlag.Name)); err != nil {
+		return err
+	}
+	log.Root().SetHandler(log.LvlFilterHandler(lvl, handler))
+
+	return nil
 }
 
 func run(ctx *cli.Context) error {
+	err := startLogger(ctx)
+	if err != nil {
+		return err
+	}
 	// Pares first argument for path
 	if ctx.NArg() < 1 {
-		log.Error("Please specify path to config json")
-		os.Exit(1)
+		return fmt.Errorf("please specify path to config json")
 	}
 	path := ctx.Args().Get(0)
 	if path == "" {
