@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 
 	log "github.com/ChainSafe/log15"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 var app = cli.NewApp()
@@ -22,7 +22,10 @@ func init() {
 	app.Copyright = "Copyright 2019 ChainSafe Systems Authors"
 	app.Name = "cfgBuilder"
 	app.Usage = "cfgBuilder [source] [destination]"
-	app.Author = "ChainSafe Systems 2019"
+	app.Authors = []*cli.Author{{
+		Name: "ChainSafe Systems 2019",
+		},
+	}
 	app.EnableBashCompletion = true
 }
 
