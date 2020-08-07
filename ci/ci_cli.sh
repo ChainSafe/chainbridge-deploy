@@ -12,6 +12,7 @@ GAS_LIMIT=6721975
 GAS_PRICE=20000000000
 
 NEW_RELAYER="0x8cED5ad0d8dA4Ec211C17355Ed3DBFEC4Cf0E5b9"
+NEW_ADMIN="0x55f511f91eE0D3368Bd6C2A7A8c1f4E685595b56"
 
 set -eux
 
@@ -43,6 +44,8 @@ $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE cent getHash
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE admin is-relayer
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE admin add-relayer --relayer $NEW_RELAYER
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE admin remove-relayer --relayer $NEW_RELAYER
+$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE admin add-admin --admin $NEW_ADMIN
+$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE admin remove-admin --admin $NEW_ADMIN
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE admin set-threshold --threshold 3
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE admin pause
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE admin unpause
