@@ -8,6 +8,8 @@
 - [`unpause`](#unpause)
 - [`set-fee`](#set-fee)
 - [`withdraw`](#withdraw)
+- [`add-admin`](#add-admin)
+- [`remove-admin`](#remove-admin)
 
 ## `is-relayer`
 Check if an address is registered as a relayer.
@@ -73,3 +75,20 @@ Withdraw tokens from a handler contract.
 --recipient <address>      Address to withdraw to
 --amountOrId <value>       Token ID or amount to withdraw
 ```
+
+## `add-admin`
+Adds an admin
+
+```
+--admin <address>   Address of admin
+--bridge <address>  Bridge contract address
+```
+
+## `remove-admin`
+Removes an admin
+
+```
+--admin <address>   Address of admin
+--bridge <address>  Bridge contract address
+```
+
