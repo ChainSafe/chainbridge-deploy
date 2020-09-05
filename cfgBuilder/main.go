@@ -24,7 +24,7 @@ func init() {
 	app.Usage = "cfgBuilder [source] [destination]"
 	app.Authors = []*cli.Author{{
 		Name: "ChainSafe Systems 2019",
-		},
+	},
 	}
 	app.EnableBashCompletion = true
 }

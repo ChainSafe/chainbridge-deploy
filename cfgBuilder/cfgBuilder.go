@@ -47,7 +47,7 @@ type Opts struct {
 	Erc721Handler  string `json:"erc721Handler,omitempty"`
 	GenericHandler string `json:"genericHandler,omitempty"`
 	GasLimit       string `json:"gasLimit,omitempty"`
-	maxGasPrice       string `json:"maxGasPrice,omitempty"`
+	MaxGasPrice    string `json:"MaxGasPrice,omitempty"`
 	StartBlock     string `json:"startBlock"`
 	Http           string `json:"http,omitempty"`
 }
@@ -61,7 +61,7 @@ type EthChainConfig struct {
 	Erc721Handler  string   `json:"erc721Handler"`
 	GenericHandler string   `json:"genericHandler"`
 	GasLimit       string   `json:"gasLimit"`
-	maxGasPrice       string   `json:"maxGasPrice"`
+	MaxGasPrice    string   `json:"MaxGasPrice"`
 	StartBlock     string   `json:"startBlock"`
 	Http           string   `json:"http"`
 	Relayers       []string `json:"relayers"`
@@ -115,7 +115,7 @@ func constructEthChainConfig(cfg EthChainConfig, relayer string) RawChainConfig 
 			Erc721Handler:  cfg.Erc721Handler,
 			GenericHandler: cfg.GenericHandler,
 			GasLimit:       cfg.GasLimit,
-			maxGasPrice:       cfg.maxGasPrice,
+			MaxGasPrice:    cfg.MaxGasPrice,
 			StartBlock:     cfg.StartBlock,
 			Http:           cfg.Http,
 		},

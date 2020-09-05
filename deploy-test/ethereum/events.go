@@ -25,7 +25,7 @@ func isExpectedEvent(evt ethtypes.Log, expectedNonce msg.Nonce, expectedSourceId
 		return false
 	}
 
-	if status.Cmp(expectedStatus) != 0{
+	if status.Cmp(expectedStatus) != 0 {
 		return false
 	}
 	return true
