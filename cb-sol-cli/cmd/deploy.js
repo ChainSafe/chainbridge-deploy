@@ -1,4 +1,5 @@
 const ethers = require('ethers');
+const fs = require('fs');
 const {Command} = require('commander');
 const constants = require('../constants');
 const {setupParentArgs, splitCommaList} = require("./utils")
@@ -18,6 +19,8 @@ const deployCmd = new Command("deploy")
     .option('--erc20', 'Deploy erc20 contract')
     .option('--erc721', 'Deploy erc721 contract')
     .option('--centAsset', 'Deploy centrifuge asset contract')
+    .option('--config', 'Creates a configuration file based on the deployment', false)
+    .option('--configFile <path>', 'Path to store configuration file to', './config.json')
     .action(async (args) => {
         await setupParentArgs(args, args.parent)
         let startBal = await args.provider.getBalance(args.wallet.address)
@@ -68,8 +71,31 @@ const deployCmd = new Command("deploy")
 
         args.cost = startBal.sub((await args.provider.getBalance(args.wallet.address)))
         displayLog(args)
+        if (args.configFile || args.config) {
+            createConfig(args)
+        }
     })
 
+const createConfig = (args) => {
+    const config = {};
+    config.name = "eth";
+    config.id = args.chainId;
+    config.endpoint = args.url;
+    config.bridge = args.bridgeContract;
+    config.erc20Handler = args.erc20HandlerContract;
+    config.erc721Handler = args.erc721HandlerContract;
+    config.genericHandler = args.genericHandlerContract;
+    config.gasLimit = args.gasLimit.toString();
+    config.maxGasPrice = args.gasPrice.toString();
+    config.relayers = args.relayers;
+    const data = JSON.stringify(config, null, 4);
+    try {
+        fs.writeFileSync(args.configFile, data);
+        console.log(`Configuration file was saved to ${args.configFile}.`);
+    } catch (error) {
+        console.error(err);
+    }
+}
 
 const displayLog = (args) => {
     console.log(`
