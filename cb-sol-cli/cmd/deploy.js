@@ -86,6 +86,8 @@ const createConfig = (args) => {
     config.genericHandler = args.genericHandlerContract;
     config.gasLimit = args.gasLimit.toString();
     config.maxGasPrice = args.gasPrice.toString();
+    config.startBlock = "0"
+    config.http = "false"
     config.relayers = args.relayers;
     const data = JSON.stringify(config, null, 4);
     console.log("EVM Configuration, please copy this into your ChainBridge config file:")
