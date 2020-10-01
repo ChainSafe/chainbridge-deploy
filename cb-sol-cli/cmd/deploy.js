@@ -78,7 +78,7 @@ const deployCmd = new Command("deploy")
 const createConfig = (args) => {
     const config = {};
     config.name = "eth";
-    config.id = args.chainId;
+    config.chainId = args.chainId;
     config.endpoint = args.url;
     config.bridge = args.bridgeContract;
     config.erc20Handler = args.erc20HandlerContract;
