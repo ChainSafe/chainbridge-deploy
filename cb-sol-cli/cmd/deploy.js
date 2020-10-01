@@ -1,5 +1,4 @@
 const ethers = require('ethers');
-const fs = require('fs');
 const {Command} = require('commander');
 const constants = require('../constants');
 const {setupParentArgs, splitCommaList} = require("./utils")
@@ -89,12 +88,8 @@ const createConfig = (args) => {
     config.maxGasPrice = args.gasPrice.toString();
     config.relayers = args.relayers;
     const data = JSON.stringify(config, null, 4);
-    try {
-        fs.writeFileSync(args.configFile, data);
-        console.log(`Configuration file was saved to ${args.configFile}.`);
-    } catch (error) {
-        console.error(err);
-    }
+    console.log("EVM Configuration, please copy this into your ChainBridge config file:")
+    console.log(data)
 }
 
 const displayLog = (args) => {
