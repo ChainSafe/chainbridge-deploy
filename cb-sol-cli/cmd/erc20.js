@@ -2,7 +2,7 @@ const ethers = require('ethers');
 const constants = require('../constants');
 
 const {Command} = require('commander');
-const {setupParentArgs, waitForTx, log} = require("./utils")
+const {setupParentArgs, waitForTx, log, expandDecimals} = require("./utils")
 
 const mintCmd = new Command("mint")
     .description("Mints erc20 tokens")
@@ -10,9 +10,10 @@ const mintCmd = new Command("mint")
     .option('--erc20Address <address>', 'ERC20 contract address', constants.ERC20_ADDRESS)
     .action(async function (args) {
         await setupParentArgs(args, args.parent.parent)
+
         const erc20Instance = new ethers.Contract(args.erc20Address, constants.ContractABIs.Erc20Mintable.abi, args.wallet);
         log(args, `Minting ${args.amount} tokens to ${args.wallet.address} on contract ${args.erc20Address}`);
-        const tx = await erc20Instance.mint(args.wallet.address, args.amount);
+        const tx = await erc20Instance.mint(args.wallet.address, expandDecimals(args.amount, args.decimals));
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -39,7 +40,7 @@ const approveCmd = new Command("approve")
 
         const erc20Instance = new ethers.Contract(args.erc20Address, constants.ContractABIs.Erc20Mintable.abi, args.wallet);
         log(args, `Approving ${args.recipient} to spend ${args.amount} tokens from ${args.wallet.address}!`);
-        const tx = await erc20Instance.approve(args.recipient, args.amount, { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
+        const tx = await erc20Instance.approve(args.recipient, expandDecimals(args.amount, args.parent.decimals), { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -52,18 +53,19 @@ const depositCmd = new Command("deposit")
     .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
     .action(async function (args) {
         await setupParentArgs(args, args.parent.parent)
+        args.decimals = args.parent.decimals
 
         // Instances
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
 
         const data = '0x' +
-            ethers.utils.hexZeroPad(ethers.utils.bigNumberify(args.amount).toHexString(), 32).substr(2) +    // Deposit Amount        (32 bytes)
+            ethers.utils.hexZeroPad(ethers.utils.bigNumberify(expandDecimals(args.amount, args.parent.decimals)).toHexString(), 32).substr(2) +    // Deposit Amount        (32 bytes)
             ethers.utils.hexZeroPad(ethers.utils.hexlify((args.recipient.length - 2)/2), 32).substr(2) +    // len(recipientAddress) (32 bytes)
             args.recipient.substr(2);                    // recipientAddress      (?? bytes)
 
         log(args, `Constructed deposit:`)
         log(args, `  Resource Id: ${args.resourceId}`)
-        log(args, `  Amount: ${ethers.utils.bigNumberify(args.amount).toHexString()}`)
+        log(args, `  Amount: ${ethers.utils.bigNumberify(expandDecimals(args.amount, args.parent.decimals)).toHexString()}`)
         log(args, `  len(recipient): ${(args.recipient.length - 2)/ 2}`)
         log(args, `  Recipient: ${args.recipient}`)
         log(args, `  Raw: ${data}`)
@@ -111,7 +113,7 @@ const createErc20ProposalData = (amount, recipient) => {
                 recipient = recipient.substr(2)
         }
         return '0x' +
-            ethers.utils.hexZeroPad(ethers.utils.bigNumberify(amount).toHexString(), 32).substr(2) +
+            ethers.utils.hexZeroPad(ethers.utils.bigNumberify(expandDecimals(amount, args.parent.decimals)).toHexString(), 32).substr(2) +
             ethers.utils.hexZeroPad(ethers.utils.hexlify(recipient.length / 2 + recipient.length % 2), 32).substr(2) +
             recipient;
 }
@@ -123,13 +125,14 @@ const proposalDataHashCmd = new Command("data-hash")
     .option('--handler <address>', 'ERC20 handler  address', constants.ERC20_HANDLER_ADDRESS)
     .action(async function(args) {
 
-        const data = createErc20ProposalData(args.amount, args.recipient)
+        const data = createErc20ProposalData(expandDecimals(args.amount, args.parent.decimals), args.recipient)
         const hash = ethers.utils.solidityKeccak256(["address", "bytes"], [args.handler, data])
 
         log(args, `Hash: ${hash} Data: ${data}`)
     })
 
 const erc20Cmd = new Command("erc20")
+.option('-d, decimals <number>', "The number of decimal places for the erc20 token")
 
 erc20Cmd.addCommand(mintCmd)
 erc20Cmd.addCommand(addMinterCmd)
