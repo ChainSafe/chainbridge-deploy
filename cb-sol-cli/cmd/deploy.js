@@ -84,8 +84,8 @@ const createConfig = (args) => {
     config.erc20Handler = args.erc20HandlerContract;
     config.erc721Handler = args.erc721HandlerContract;
     config.genericHandler = args.genericHandlerContract;
-    config.gasLimit = args.gasLimit.toString();
-    config.maxGasPrice = args.gasPrice.toString();
+    config.gasLimit = args.gasLimit.toNumber();
+    config.maxGasPrice = args.gasPrice.toNumber();
     config.startBlock = "0"
     config.http = "false"
     config.relayers = args.relayers;
