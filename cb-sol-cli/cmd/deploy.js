@@ -18,8 +18,7 @@ const deployCmd = new Command("deploy")
     .option('--erc20', 'Deploy erc20 contract')
     .option('--erc721', 'Deploy erc721 contract')
     .option('--centAsset', 'Deploy centrifuge asset contract')
-    .option('--config', 'Creates a configuration file based on the deployment', false)
-    .option('--configFile <path>', 'Path to store configuration file to', './config.json')
+    .option('--config', 'Logs the configuration based on the deployment', false)
     .action(async (args) => {
         await setupParentArgs(args, args.parent)
         let startBal = await args.provider.getBalance(args.wallet.address)
@@ -70,7 +69,7 @@ const deployCmd = new Command("deploy")
 
         args.cost = startBal.sub((await args.provider.getBalance(args.wallet.address)))
         displayLog(args)
-        if (args.configFile || args.config) {
+        if (args.config) {
             createConfig(args)
         }
     })
