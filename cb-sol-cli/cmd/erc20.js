@@ -59,13 +59,13 @@ const depositCmd = new Command("deposit")
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
 
         const data = '0x' +
-            ethers.utils.hexZeroPad(ethers.utils.bigNumberify(expandDecimals(args.amount, args.parent.decimals)).toHexString(), 32).substr(2) +    // Deposit Amount        (32 bytes)
+            ethers.utils.hexZeroPad(expandDecimals(args.amount, args.parent.decimals).toHexString(), 32).substr(2) +    // Deposit Amount        (32 bytes)
             ethers.utils.hexZeroPad(ethers.utils.hexlify((args.recipient.length - 2)/2), 32).substr(2) +    // len(recipientAddress) (32 bytes)
             args.recipient.substr(2);                    // recipientAddress      (?? bytes)
 
         log(args, `Constructed deposit:`)
         log(args, `  Resource Id: ${args.resourceId}`)
-        log(args, `  Amount: ${ethers.utils.bigNumberify(expandDecimals(args.amount, args.parent.decimals)).toHexString()}`)
+        log(args, `  Amount: ${expandDecimals(args.amount, args.parent.decimals).toHexString()}`)
         log(args, `  len(recipient): ${(args.recipient.length - 2)/ 2}`)
         log(args, `  Recipient: ${args.recipient}`)
         log(args, `  Raw: ${data}`)
@@ -113,7 +113,7 @@ const createErc20ProposalData = (amount, recipient) => {
                 recipient = recipient.substr(2)
         }
         return '0x' +
-            ethers.utils.hexZeroPad(ethers.utils.bigNumberify(expandDecimals(amount, args.parent.decimals)).toHexString(), 32).substr(2) +
+            ethers.utils.hexZeroPad(expandDecimals(amount, args.parent.decimals).toHexString(), 32).substr(2) +
             ethers.utils.hexZeroPad(ethers.utils.hexlify(recipient.length / 2 + recipient.length % 2), 32).substr(2) +
             recipient;
 }
