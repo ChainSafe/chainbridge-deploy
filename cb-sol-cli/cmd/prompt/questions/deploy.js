@@ -1,3 +1,5 @@
+const { ethers } = require("ethers");
+
 module.exports = {
     contracts: [
         {
@@ -39,17 +41,55 @@ module.exports = {
             ]
         }
     ],
-    relayers: [
+    bridge: [
         {
             type: "number",
-            name: "numRelayers",
-            message: "How many relayers do you want? (number)"
+            name: "fee",
+            message: "What fee would you like to charge? (in ETH)",
+            validate: x => x <= 0 ? "Number must be greater than 0" : true
         },
         {
             type: "number",
-            name: "threshold",
-            message: "What threshold do you want? (number)"
+            name: "expiry",
+            message: "Number of blocks after which a proposal is considered cancelled?",
+            validate: x => x <= 0 ? "Number must be greater than 0" : true
         },
-        
-    ]
+        {
+            type: "number",
+            name: "chainId",
+            message: "What is the ChainBridge chainId?",
+            validate: x => x <= 0 ? "Number must be greater than 0" : true
+        }
+    ],
+    relayer: {
+        relayerNumber: {
+                type: "number",
+                name: "numRelayers",
+                message: "How many relayers do you want? (number)",
+                validate: x => x <= 0 ? "Number must be greater than 0" : true
+            },
+        relayerThreshold: {
+                type: "number",
+                name: "relayerThreshold",
+                message: "What threshold do you want? (number)"
+            },
+        relayerAddresses: {
+            type: "list",
+            name: "relayerAddresses",
+            message: "Enter relayer addresses (Comma separated values)",
+            separator: ",",
+            validate: function(values) {
+                values = values.split(",");
+                for (let i=0; i < values.length; i++) {
+                    try {
+                        // an invalid address will throw
+                        ethers.utils.getAddress(values[i]);
+                    } catch (e) {
+                        return `${values[i]} is not a valid Ethereum address!`
+                    }
+                }
+                return true;
+            }
+        }
+    }
 }

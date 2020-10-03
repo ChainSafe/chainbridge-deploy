@@ -5,35 +5,61 @@ const {initial, deploy} = require("./questions");
 const promptCommand = new Command("prompt")
 .description("An easy to use cli that wraps cb-sol-cli")
 .action(async function(args) {
+    const config = {
+        useConfig: false,
+        contracts: [],
+        numRelayers: null,
+        relayerThreshold: null,
+        relayerAddresses: [],
+    };
 
     // Check if user wants to load from config
-    let response = await prompts(initial.useConfig);
-    if (response.useConfig.toLowerCase() === "y") {
+    config.useConfig = (await prompts(initial.useConfig)).useConfig;
+    if (config.useConfig) {
         console.log("TODO Load from config")
     }
 
-    // Prompt user for deployments
-    response = await prompts(deploy.contracts);
-    console.log("Do something with responses")    
-    
-    // Prompt user for relayers
-    response = await recursivePrompt(
-        deploy.relayers, 
-        function({threshold, numRelayers}){return threshold > 0 && numRelayers > 0 && threshold <= numRelayers},
-        "The relayer threshold must be `<=` the number of relayers! Please try again!"
-    );
-    console.log("made it", response);
+    // // Prompt user for deployments
+    config.contracts = (await prompts(deploy.contracts)).contracts;
 
+    // Get bridge contract specific configuration
+    if (config.contracts.includes("bridge")) {
+        config.bridgeOpts = await prompts(deploy.bridge);
+    }
+
+    // Prompt user for number of relayers
+    config.numRelayers = (await prompts(deploy.relayer.relayerNumber)).numRelayers;
+    
+    // Get the relayer threshold
+    let whileFlag = true
+    while (whileFlag) {
+        const response = await prompts(deploy.relayer.relayerThreshold);
+        if (response.relayerThreshold > config.numRelayers) {
+            console.log("> Threshold must be less than or equal to the number of relayers!");
+        } else {
+            config.relayerThreshold = response.relayerThreshold;
+            whileFlag = false;
+        }
+    }
+    
+    // Get the relayer addresses
+    whileFlag = true
+    while (whileFlag) {
+        const {relayerAddresses} = await prompts(deploy.relayer.relayerAddresses);
+        if (relayerAddresses.length !== config.numRelayers) {
+             console.log(`> You entered ${relayerAddresses.length} addresses, you must enter a total of ${config.numRelayers}!`);
+        } else {
+            config.relayerAddresses = relayerAddresses;
+            whileFlag = false;
+        }
+    }
+    
+
+    console.log(config)
 });
 
-async function recursivePrompt(questions, condition, errorMessage) {
-    const responses = await prompts(questions)
-    if (condition(responses)) {
-        return responses;
-    } else {
-        console.log(errorMessage);
-        await recursivePrompt(questions, condition, errorMessage);
-    }
-}
-
 module.exports = promptCommand;
+
+// expiry
+// fee
+// chainId

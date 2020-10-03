@@ -1,7 +1,10 @@
 module.exports = {
     useConfig: {
-        type: "text",
+        type: "toggle",
         name: "useConfig",
-        message: "Do you want to use your existing configuration? (y/n)"
+        message: "Do you want to use your existing configuration?",
+        initial: true,
+        active: 'yes',
+        inactive: 'no'
     },
 }
