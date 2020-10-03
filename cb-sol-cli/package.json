@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "commander": "^5.0.0",
-    "ethers": "^4.0.46"
+    "ethers": "^4.0.46",
+    "prompts": "^2.3.2"
   }
 }
