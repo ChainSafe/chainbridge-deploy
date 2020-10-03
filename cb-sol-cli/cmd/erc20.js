@@ -108,12 +108,12 @@ const allowanceCmd = new Command("allowance")
         log(args, `Spender ${args.spender} is allowed to spend ${allowance} tokens on behalf of ${args.owner}`)
     })
 
-const createErc20ProposalData = (amount, recipient) => {
+const createErc20ProposalData = (amount, recipient, decimals) => {
         if (recipient.substr(0, 2) === "0x") {
                 recipient = recipient.substr(2)
         }
         return '0x' +
-            ethers.utils.hexZeroPad(expandDecimals(amount, args.parent.decimals).toHexString(), 32).substr(2) +
+            ethers.utils.hexZeroPad(ethers.utils.hexlify(amount), 32).substr(2) +
             ethers.utils.hexZeroPad(ethers.utils.hexlify(recipient.length / 2 + recipient.length % 2), 32).substr(2) +
             recipient;
 }
@@ -124,7 +124,6 @@ const proposalDataHashCmd = new Command("data-hash")
     .option('--recipient <address>', 'Destination recipient address', constants.relayerAddresses[4])
     .option('--handler <address>', 'ERC20 handler  address', constants.ERC20_HANDLER_ADDRESS)
     .action(async function(args) {
-
         const data = createErc20ProposalData(expandDecimals(args.amount, args.parent.decimals), args.recipient)
         const hash = ethers.utils.solidityKeccak256(["address", "bytes"], [args.handler, data])
 
@@ -132,7 +131,7 @@ const proposalDataHashCmd = new Command("data-hash")
     })
 
 const erc20Cmd = new Command("erc20")
-.option('-d, decimals <number>', "The number of decimal places for the erc20 token")
+.option('-d, decimals <number>', "The number of decimal places for the erc20 token", 18)
 
 erc20Cmd.addCommand(mintCmd)
 erc20Cmd.addCommand(addMinterCmd)
