@@ -34,7 +34,6 @@ async function recursivePrompt(questions, condition, errorMessage) {
         console.log(errorMessage);
         await recursivePrompt(questions, condition, errorMessage);
     }
-
 }
 
 module.exports = promptCommand;
