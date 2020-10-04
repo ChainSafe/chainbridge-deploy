@@ -18,6 +18,7 @@ const deployCmd = new Command("deploy")
     .option('--erc20', 'Deploy erc20 contract')
     .option('--erc721', 'Deploy erc721 contract')
     .option('--centAsset', 'Deploy centrifuge asset contract')
+    .option('--config', 'Logs the configuration based on the deployment', false)
     .action(async (args) => {
         await setupParentArgs(args, args.parent)
         let startBal = await args.provider.getBalance(args.wallet.address)
@@ -68,8 +69,29 @@ const deployCmd = new Command("deploy")
 
         args.cost = startBal.sub((await args.provider.getBalance(args.wallet.address)))
         displayLog(args)
+        if (args.config) {
+            createConfig(args)
+        }
     })
 
+const createConfig = (args) => {
+    const config = {};
+    config.name = "eth";
+    config.chainId = args.chainId;
+    config.endpoint = args.url;
+    config.bridge = args.bridgeContract;
+    config.erc20Handler = args.erc20HandlerContract;
+    config.erc721Handler = args.erc721HandlerContract;
+    config.genericHandler = args.genericHandlerContract;
+    config.gasLimit = args.gasLimit.toNumber();
+    config.maxGasPrice = args.gasPrice.toNumber();
+    config.startBlock = "0"
+    config.http = "false"
+    config.relayers = args.relayers;
+    const data = JSON.stringify(config, null, 4);
+    console.log("EVM Configuration, please copy this into your ChainBridge config file:")
+    console.log(data)
+}
 
 const displayLog = (args) => {
     console.log(`

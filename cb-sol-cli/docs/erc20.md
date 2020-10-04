@@ -1,5 +1,10 @@
 # ERC20 Command
 
+```
+-d, decimals <number>          The number of decimal places for the erc20 token
+
+```
+
 - [`mint`](#mint)
 - [`add-minter`](#add-minter)
 - [`approve`](#approve)

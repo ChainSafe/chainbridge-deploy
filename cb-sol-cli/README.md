@@ -16,6 +16,7 @@ The root command (`cb-sol-cli`) has some options:
 --url <value>                 URL to connect to
 --gasLimit <value>            Gas limit for transactions 
 --gasPrice <value>            Gas limit for transactions 
+--networkId <value>	      Network id
 ```
 \
 The keypair used for interactions can be configured with:

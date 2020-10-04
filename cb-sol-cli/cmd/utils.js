@@ -41,6 +41,10 @@ const waitForTx = async (provider, hash) => {
     }
 }
 
+const expandDecimals = (amount, decimals = 18) => {
+    return ethers.utils.parseUnits(String(amount), decimals);
+}
+
 const log = (args, msg) => console.log(`[${args.parent._name}/${args._name}] ${msg}`)
 
 module.exports = {
@@ -48,5 +52,6 @@ module.exports = {
     splitCommaList,
     getFunctionBytes,
     waitForTx,
-    log
+    log,
+    expandDecimals
 }
