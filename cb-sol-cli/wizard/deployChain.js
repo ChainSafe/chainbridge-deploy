@@ -3,8 +3,9 @@ const ethers = require("ethers");
 const { initial, generic } = require("./questions");
 const { fetchConfig, getChainsFromConfig, updateConfig, unlockWallet } = require("./helpers")
 const {deployBridgeContract, deployERC20Handler, deployERC721Handler, deployGenericHandler, deployERC721, deployERC20, deployCentrifugeAssetStore} = require("../cmd/deploy");
+const deploy = require("./questions/deploy");
 
-async function deployChain(name, deployAll = true) {
+async function deployChain(name = null, deployAll = false) {
     const config = fetchConfig();
     const chains = getChainsFromConfig(config);
 
@@ -35,63 +36,71 @@ async function deployChain(name, deployAll = true) {
         }
     }
 
+    // We always have to deploy the bridge contract first
+    if (chain.contracts.bridge && !chain.contracts.bridge.address) {
+        const contract = await deployBridgeContract({
+            wallet,
+            chainId: chain.bridgeOpts.chainId.toString(),
+            relayers: chain.relayerAddresses,
+            relayerThreshold: chain.relayerThreshold,
+            fee: chain.bridgeOpts.fee,
+            expiry: chain.bridgeOpts.expiry
+        });
+        chain.contracts.bridge.address = contract.address;
+    }
+    // /home/greg/Desktop/example-wallet.json
+
     if (deployAll) {
-
-        // We always have to deploy the bridge contract first
-        if (chain.contracts.bridge && !chain.contracts.bridge.address) {
-            const contract = await deployBridgeContract({
-                wallet,
-                chainId: chain.bridgeOpts.chainId.toString(),
-                relayers: chain.relayerAddresses,
-                relayerThreshold: chain.relayerThreshold,
-                fee: chain.bridgeOpts.fee,
-                expiry: chain.bridgeOpts.expiry
-            });
-            chain.contracts.bridge.address = contract.address;
-        }
-
         // Deploy remaining contracts
         for (let contractName in chain.contracts) {
-            if (contractName === "erc20Handler") {
-                const contract = await deployERC20Handler({
-                    wallet,
-                    bridgeContract: chain.contracts.bridge.address
-                })
-                chain.contracts.erc20Handler.address = contract.address;
-            }
-            if (contractName === "erc721Handler") {
-                const contract = await deployERC721Handler({
-                    wallet,
-                    bridgeContract: chain.contracts.bridge.address
-                })
-                chain.contracts.erc721Handler.address = contract.address;
-            }
-            if (contractName === "genericHandler") {
-                const contract = await deployGenericHandler({
-                    wallet,
-                    bridgeContract: chain.contracts.bridge.address
-                })
-                chain.contracts.genericHandler.address = contract.address;
-            }
-            if (contractName === "erc20") {
-                const contract = await deployERC20({wallet});
-                chain.contracts.erc20.address = contract.address;
-            }
-            if (contractName === "erc721") {
-                const contract = await deployERC721({wallet});
-                chain.contracts.erc721.address = contract.address;
-            }
-            if (contractName === "centrifuge") {
-                const contract = await deployCentrifugeAssetStore({wallet});
-                chain.contracts.centrifuge.address = contract.address;
-            }
+            if (contractName !== "bridge") {
+                chain.contracts[contractName].address = await deployContract(contractName, chain, wallet);
+            };
         };
     } else {
-        // todo implement
+        // Filter out bridge contract
+        const list = Object.keys(chain.contracts)
+            .map(x => { return { title: x, value: x }})
+            .filter(x => { return x.title !== "bridge"});
+    
+        // Prompt user
+        const {multiSelect} = await prompts(generic.multiselect("Please confirm which contracts you want to deploy!", "", list));
+        for (let i = 0; i < multiSelect.length; i++) {
+            const address = await deployContract(multiSelect[i], chain, wallet);
+            chain.contracts[multiSelect[i]].address = address;
+        }
     }
-
     config[selectedChain] = chain;
     updateConfig(config);
+}
+
+async function deployContract(contractName, chain, wallet) {
+    switch (contractName) {
+        case "erc20Handler":
+            console.log(contractName)
+            let c = await deployERC20Handler({
+                wallet,
+                bridgeContract: chain.contracts.bridge.address
+            })
+            console.log(c.address)
+            return c.address;
+        case "erc721Handler":
+            return (await deployERC721Handler({
+                wallet,
+                bridgeContract: chain.contracts.bridge.address
+            })).address
+        case "genericHandler":
+            return (await deployGenericHandler({
+                wallet,
+                bridgeContract: chain.contracts.bridge.address
+            })).address
+        case "erc20":
+            return (await deployERC20({wallet})).address;
+        case "erc721":
+            return (await deployERC721({wallet})).address;
+        case "centrifuge":
+            return (await deployCentrifugeAssetStore({wallet})).address;
+    }
 }
 
 module.exports = {

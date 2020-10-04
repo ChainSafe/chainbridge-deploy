@@ -62,7 +62,7 @@ async function addChain() {
     // Ask if the user wishes to deploy this chain
     const { verify } = await prompts(generic.verify("Do you want to deploy this configuration?", ""));
     if (verify) {
-        await deployChain(name);
+        await deployChain(name, true);
     }
 }
 

@@ -7,30 +7,6 @@ const {deployChain} = require("./deployChain");
 const {deleteChain} = require("./deleteChain");
 
 (async function() {
-    let loadedConfig = false;
-    
-    /**
-     * interface config {
-            [key: string]: chain[];
-        }
-        interface chain {
-            url: String;
-            networkId: Number;
-            contracts: {
-                address: String;
-                name: String;
-            }[];
-            numRelayers: Number;
-            relayerThreshold: Number;
-            relayerAddresses: String[];
-            bridgeOpts: {
-                fee: Number;
-                expiry: Number;
-                chainId: Number;
-            };
-        }
-     */
-
     const {action} = await prompts(initial.action);
     switch (action) {
         case "addChain":

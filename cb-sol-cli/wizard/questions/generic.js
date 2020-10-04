@@ -10,5 +10,15 @@ module.exports = {
                 {title: "no", value: false}
             ]
        }
+    },
+    multiselect: (message, hint, list) => {
+        return {
+            type: "multiselect",
+            name: "multiSelect",
+            message,
+            hint,
+            instructions: false,
+            choices: list
+        }
     }
 }
