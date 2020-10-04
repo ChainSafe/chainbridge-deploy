@@ -1,6 +1,8 @@
 const prompts = require("prompts");
+const {deployChain} = require("./deployChain");
 const {updateConfig, fetchConfig} = require("./helpers");
 const {deploy, initial} = require("./questions");
+const generic = require("./questions/generic");
 
 async function addChain() {
     const config = {
@@ -56,6 +58,12 @@ async function addChain() {
     // Save configuration file
     oldConfig[name] = config;
     updateConfig(oldConfig);
+
+    // Ask if the user wishes to deploy this chain
+    const { verify } = await prompts(generic.verify("Do you want to deploy this configuration?", ""));
+    if (verify) {
+        await deployChain(name);
+    }
 }
 
 module.exports = {

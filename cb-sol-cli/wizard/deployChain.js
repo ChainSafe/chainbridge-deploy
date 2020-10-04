@@ -4,12 +4,12 @@ const { initial, generic } = require("./questions");
 const { fetchConfig, getChainsFromConfig, updateConfig, unlockWallet } = require("./helpers")
 const {deployBridgeContract, deployERC20Handler, deployERC721Handler, deployGenericHandler, deployERC721, deployERC20, deployCentrifugeAssetStore} = require("../cmd/deploy");
 
-async function deployChain(deployAll = true) {
+async function deployChain(name, deployAll = true) {
     const config = fetchConfig();
     const chains = getChainsFromConfig(config);
 
     // Ask user which chain they want to update
-    const {selectedChain} = await prompts(initial.selectChain(chains));
+    const selectedChain = name ? name : (await prompts(initial.selectChain(chains))).selectedChain;
     const chain = config[selectedChain];
 
     // Prompt user for wallet

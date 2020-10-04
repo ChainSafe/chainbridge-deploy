@@ -9,6 +9,7 @@ module.exports = {
             {title: "Update existing chain", value: "updateChain"},
             {title: "View config", value: "viewConfig"},
             {title: "Deploy Chain", value: "deployChain"},
+            {title: "Delete Chain", value: "deleteChain"},
             {title: "Quit", value: "quit"}
         ]
     },
