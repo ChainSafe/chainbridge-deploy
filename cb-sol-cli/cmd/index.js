@@ -4,7 +4,6 @@ const admin = require("./admin")
 const erc20 = require("./erc20");
 const erc721 = require("./erc721");
 const centrifuge = require("./centrifuge");
-const prompt = require("./prompt");
 
 module.exports = {
     deploy,
@@ -13,5 +12,4 @@ module.exports = {
     erc20,
     erc721,
     centrifuge,
-    prompt,
 }

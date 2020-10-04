@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/ChainSafe/chainbridge-deploy#readme",
   "bin": {
-    "cb-sol-cli": "./index.js"
+    "cb-sol-cli": "./index.js",
+    "cb-wizard": "./wizard/index.js"
   },
   "dependencies": {
     "commander": "^5.0.0",
