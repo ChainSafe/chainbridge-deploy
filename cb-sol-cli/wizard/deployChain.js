@@ -48,7 +48,6 @@ async function deployChain(name = null, deployAll = false) {
         });
         chain.contracts.bridge.address = contract.address;
     }
-    // /home/greg/Desktop/example-wallet.json
 
     if (deployAll) {
         // Deploy remaining contracts
