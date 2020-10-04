@@ -42,11 +42,7 @@ const waitForTx = async (provider, hash) => {
 }
 
 const expandDecimals = (amount, decimals = 18) => {
-<<<<<<< HEAD
-    return ethers.utils.bigNumberify(String(amount).padStart(decimals, '0'));
-=======
     return ethers.utils.parseUnits(String(amount), decimals);
->>>>>>> 339ecadb2c74a7d1535cda5a8a4ad65a7b4e35fc
 }
 
 const log = (args, msg) => console.log(`[${args.parent._name}/${args._name}] ${msg}`)
