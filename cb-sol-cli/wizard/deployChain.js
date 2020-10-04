@@ -12,11 +12,13 @@ async function deployChain(deployAll = true) {
     const {selectedChain} = await prompts(initial.selectChain(chains));
     const chain = config[selectedChain];
 
-    const provider = new ethers.providers.JsonRpcProvider(chain.url);
-
     // Prompt user for wallet
-    await unlockWallet(chain.encryptedWallet);
-    const wallet = new ethers.Wallet("0xb1157e88556d967936019ff60145276bd6618b9e2a67e505b79a1b50b47fd0f5", provider);
+    let {wallet, encryptedWallet} = await unlockWallet(chain.encryptedWallet);
+    chain.encryptedWallet = encryptedWallet;
+
+    // Connect wallet to the provider
+    const provider = new ethers.providers.JsonRpcProvider(chain.url);
+    wallet = wallet.connect(provider);
 
     let existsFlag = false;
     for (let contract in chain.contracts) {

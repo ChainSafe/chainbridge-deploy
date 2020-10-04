@@ -8,24 +8,23 @@ const configFilename = "config.json";
 const configFullPath = configDir + configFilename;
 
 async function unlockWallet(encryptedWallet = null) {
-    let json;
     if (!encryptedWallet) {
         const {path} = await prompts(initial.walletPath);
         try {
             const data = fs.readFileSync(path, 'utf-8');
-            json = JSON.parse(data.toString());
+            encryptedWallet = JSON.stringify(JSON.parse(data.toString()));
         } catch (e) {
+            console.log(e)
             console.log("Couldn't find wallet!")
             process.exit();
         }
     }
     const {password} = await prompts(initial.walletPassword);
     try {
-        const wallet = await ethers.Wallet.fromEncryptedJson(json, password);
-        process.exit()
-        return {wallet, path};
+        const wallet = await ethers.Wallet.fromEncryptedJson(encryptedWallet, password);
+        return {wallet, encryptedWallet};
     } catch (e) {
-        console.log(e);
+        console.log("error", e);
         process.exit();
     }
 }
