@@ -29,7 +29,6 @@ const {deployChain} = require("./deployChain");
             };
         }
      */
-    let config = {};
 
     const {action} = await prompts(initial.action);
     switch (action) {

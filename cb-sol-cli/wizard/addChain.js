@@ -20,7 +20,7 @@ async function addChain() {
         .map(x => { return {name: x, address: ""}});
     
     // Get bridge contract specific configuration
-    if (config.contracts.map(x => x).includes("bridge")) {
+    if (config.contracts.map(x => x.name).includes("bridge")) {
         config.bridgeOpts = await prompts(deploy.bridge);
 
         // Prompt user for number of relayers
