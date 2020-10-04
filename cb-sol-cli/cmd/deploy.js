@@ -147,6 +147,7 @@ async function deployBridgeContract(args) {
     await contract.deployed();
     args.bridgeContract = contract.address
     console.log("✓ Bridge contract deployed")
+    return contract;
 }
 
 async function deployERC20(args) {
@@ -155,16 +156,16 @@ async function deployERC20(args) {
     await contract.deployed();
     args.erc20Contract = contract.address
     console.log("✓ ERC20 contract deployed")
+    return contract;
 }
 
 async function deployERC20Handler(args) {
     const factory = new ethers.ContractFactory(constants.ContractABIs.Erc20Handler.abi, constants.ContractABIs.Erc20Handler.bytecode, args.wallet);
-
-
     const contract = await factory.deploy(args.bridgeContract, [], [], [], { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
     await contract.deployed();
     args.erc20HandlerContract = contract.address
     console.log("✓ ERC20Handler contract deployed")
+    return contract;
 }
 
 async function deployERC721(args) {
@@ -173,6 +174,7 @@ async function deployERC721(args) {
     await contract.deployed();
     args.erc721Contract = contract.address
     console.log("✓ ERC721 contract deployed")
+    return contract;
 }
 
 async function deployERC721Handler(args) {
@@ -181,6 +183,7 @@ async function deployERC721Handler(args) {
     await contract.deployed();
     args.erc721HandlerContract = contract.address
     console.log("✓ ERC721Handler contract deployed")
+    return contract;
 }
 
 async function deployGenericHandler(args) {
@@ -189,6 +192,7 @@ async function deployGenericHandler(args) {
     await contract.deployed();
     args.genericHandlerContract = contract.address
     console.log("✓ GenericHandler contract deployed")
+    return contract;
 }
 
 async function deployCentrifugeAssetStore(args) {
@@ -197,6 +201,16 @@ async function deployCentrifugeAssetStore(args) {
     await contract.deployed();
     args.centrifugeAssetStoreContract = contract.address
     console.log("✓ CentrifugeAssetStore contract deployed")
+    return contract;
 }
 
-module.exports = deployCmd
+module.exports = {
+    deployCmd,
+    deployBridgeContract,
+    deployERC20,
+    deployERC20Handler,
+    deployERC721,
+    deployERC721Handler,
+    deployGenericHandler,
+    deployCentrifugeAssetStore,
+}

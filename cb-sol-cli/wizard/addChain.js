@@ -3,7 +3,9 @@ const {updateConfig, fetchConfig} = require("./helpers");
 const {deploy, initial} = require("./questions");
 
 async function addChain() {
-    const config = {};
+    const config = {
+        contracts: {}
+    };
 
     // Get the old config
     const oldConfig = fetchConfig() || {};
@@ -15,12 +17,12 @@ async function addChain() {
     config.chainOpts = await prompts(initial.chainOpts);
 
     // Prompt user for deployments
-    config.contracts = (await prompts(deploy.contracts))
+    (await prompts(deploy.contracts))
         .contracts
-        .map(x => { return {name: x, address: ""}});
-    
+        .forEach(x => { config.contracts[x] = {address: ""}});
+
     // Get bridge contract specific configuration
-    if (config.contracts.map(x => x.name).includes("bridge")) {
+    if (config.contracts.bridge) {
         config.bridgeOpts = await prompts(deploy.bridge);
 
         // Prompt user for number of relayers

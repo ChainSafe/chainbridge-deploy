@@ -1,8 +1,8 @@
 module.exports = {
-    update: (message, hint) => {
+    verify: (message, hint) => {
         return {
             type: "select",
-            name: "update",
+            name: "verify",
             message,
             hint,
             choices: [
