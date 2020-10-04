@@ -1,8 +1,34 @@
 const homedir = require('os').homedir();
+const { ethers } = require('ethers');
+const {initial} = require("./questions");
 const fs = require("fs");
+const prompts = require('prompts');
 const configDir = homedir + "/.cb-sol-cli/";
 const configFilename = "config.json";
 const configFullPath = configDir + configFilename;
+
+async function unlockWallet(encryptedWallet = null) {
+    let json;
+    if (!encryptedWallet) {
+        const {path} = await prompts(initial.walletPath);
+        try {
+            const data = fs.readFileSync(path, 'utf-8');
+            json = JSON.parse(data.toString());
+        } catch (e) {
+            console.log("Couldn't find wallet!")
+            process.exit();
+        }
+    }
+    const {password} = await prompts(initial.walletPassword);
+    try {
+        const wallet = await ethers.Wallet.fromEncryptedJson(json, password);
+        process.exit()
+        return {wallet, path};
+    } catch (e) {
+        console.log(e);
+        process.exit();
+    }
+}
 
 function fetchConfig() {
     try {
@@ -35,4 +61,5 @@ module.exports = {
     fetchConfig,
     updateConfig,
     getChainsFromConfig,
+    unlockWallet,
 }

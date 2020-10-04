@@ -1,7 +1,7 @@
 const prompts = require("prompts");
 const ethers = require("ethers");
 const { initial, generic } = require("./questions");
-const { fetchConfig, getChainsFromConfig, updateConfig } = require("./helpers")
+const { fetchConfig, getChainsFromConfig, updateConfig, unlockWallet } = require("./helpers")
 const {deployBridgeContract, deployERC20Handler, deployERC721Handler, deployGenericHandler, deployERC721, deployERC20, deployCentrifugeAssetStore} = require("../cmd/deploy");
 
 async function deployChain(deployAll = true) {
@@ -13,7 +13,9 @@ async function deployChain(deployAll = true) {
     const chain = config[selectedChain];
 
     const provider = new ethers.providers.JsonRpcProvider(chain.url);
-    // TODO
+
+    // Prompt user for wallet
+    await unlockWallet(chain.encryptedWallet);
     const wallet = new ethers.Wallet("0xb1157e88556d967936019ff60145276bd6618b9e2a67e505b79a1b50b47fd0f5", provider);
 
     let existsFlag = false;
@@ -85,6 +87,7 @@ async function deployChain(deployAll = true) {
     } else {
         // todo implement
     }
+
     config[selectedChain] = chain;
     updateConfig(config);
 }

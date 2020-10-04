@@ -48,5 +48,15 @@ module.exports = {
             name: "networkId",
             message: "What is the chain network id?"
         }
-    ]
+    ],
+    walletPath: {
+        type: "text",
+        name: "path",
+        message: "What is the path to your wallet?",
+    },
+    walletPassword: {
+        type: "password",
+        name: "password",
+        message: "Please enter your keystore password"
+    }
 }
