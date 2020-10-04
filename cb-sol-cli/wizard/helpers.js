@@ -9,8 +9,8 @@ function fetchConfig() {
         const data = fs.readFileSync(configFullPath, 'utf-8');
         return JSON.parse(data.toString());
     } catch (e) {
-        console.log(e);
         console.log("Couldn't find config file!")
+        return null;
     }
 }
 
@@ -27,7 +27,12 @@ function updateConfig(config) {
     }
 }
 
+function getChainsFromConfig(config) {
+    return Object.keys(config).map(x => {return {title: x, value: x }});
+}
+
 module.exports = {
     fetchConfig,
     updateConfig,
+    getChainsFromConfig,
 }

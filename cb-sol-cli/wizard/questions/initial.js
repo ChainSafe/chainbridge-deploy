@@ -1,21 +1,41 @@
-const { initial } = require(".");
-
 module.exports = {
-    useConfig: {
-        type: "toggle",
-        name: "useConfig",
-        message: "Do you want to use your existing configuration?",
-        initial: true,
-        active: "yes",
-        inactive: "no"
+    action: {
+        type: "select",
+        name: "action",
+        message: "What do you want to do?",
+        instructions: false,
+        choices: [
+            {title: "Add new chain", value: "addChain"},
+            {title: "Update existing chain", value: "updateChain"},
+            {title: "View config", value: "viewConfig"},
+            {title: "Deploy Chain", value: "deployChain"},
+            {title: "Quit", value: "quit"}
+        ]
     },
-    updateConfig: {
+    selectChain: (chains) => {
+        return {
+            type: "select",
+            name: "selectedChain",
+            message: "Choose a chain to update?",
+            instructions: false,
+            choices: chains
+        }
+    },
+    confirmUpdate: {
         type: "toggle",
-        name: "updateConfig",
-        message: "Do you want to update this configuration file?",
+        name: "confirmUpdate",
+        message: "Are you sure you want to update this configuration file?",
         initial: false,
         active: "yes",
         inactive: "no"
+    },
+    name: (existingChains) => {
+        return {
+            type: "text",
+            name: "name",
+            message: "Please provide a unique name for this chain",
+            validate: x => existingChains.includes(x) ? "Name already taken!" : true
+        }
     },
     chainOpts: [
         {
