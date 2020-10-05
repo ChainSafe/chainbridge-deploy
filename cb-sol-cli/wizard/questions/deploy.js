@@ -46,7 +46,7 @@ module.exports = {
             type: "number",
             name: "fee",
             message: "What fee would you like to charge? (in ETH)",
-            validate: x => x <= 0 ? "Number must be greater than 0" : true
+            validate: x => x < 0 ? "Number must be greater than 0" : true
         },
         {
             type: "number",
@@ -65,13 +65,13 @@ module.exports = {
         relayerNumber: {
                 type: "number",
                 name: "numRelayers",
-                message: "How many relayers do you want? (number)",
+                message: "How many relayers do you want?",
                 validate: x => x <= 0 ? "Number must be greater than 0" : true
             },
         relayerThreshold: {
                 type: "number",
                 name: "relayerThreshold",
-                message: "What threshold do you want? (number)"
+                message: "What vote threshold do you want?"
             },
         relayerAddresses: {
             type: "list",
