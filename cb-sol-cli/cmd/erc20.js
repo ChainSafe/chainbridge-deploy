@@ -57,9 +57,8 @@ const depositCmd = new Command("deposit")
 
         // Instances
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
-
         const data = '0x' +
-            ethers.utils.hexZeroPad(expandDecimals(args.amount, args.parent.decimals).toHexString(), 32).substr(2) +    // Deposit Amount        (32 bytes)
+            ethers.utils.hexZeroPad(ethers.utils.bigNumberify(expandDecimals(args.amount, args.parent.decimals)).toHexString(), 32).substr(2) +    // Deposit Amount        (32 bytes)
             ethers.utils.hexZeroPad(ethers.utils.hexlify((args.recipient.length - 2)/2), 32).substr(2) +    // len(recipientAddress) (32 bytes)
             args.recipient.substr(2);                    // recipientAddress      (?? bytes)
 
@@ -91,7 +90,8 @@ const balanceCmd = new Command("balance")
 
         const erc20Instance = new ethers.Contract(args.erc20Address, constants.ContractABIs.Erc20Mintable.abi, args.wallet);
         const balance = await erc20Instance.balanceOf(args.address)
-        log(args, `Account ${args.address} has a balance of ${balance}` )
+        const decimals = await erc20Instance.decimals();
+        log(args, `Account ${args.address} has a balance of ${balance / 10 ** decimals}` )
     })
 
 const allowanceCmd = new Command("allowance")
