@@ -3,7 +3,14 @@ const fs = require('fs');
 
 const setupParentArgs = async (args, parent) => {
     args.url= parent.url
-    args.provider = new ethers.providers.JsonRpcProvider(args.url);
+    if (!parent.networkId) {
+        args.provider = new ethers.providers.JsonRpcProvider(args.url);
+    } else {
+        args.provider = new ethers.providers.JsonRpcProvider(args.url, {
+            name: "custom",
+            chainId: Number(parent.networkId)
+        });
+    }
     args.gasLimit = ethers.utils.hexlify(Number(parent.gasLimit))
     args.gasPrice = ethers.utils.hexlify(Number(parent.gasPrice))
     if (!parent.jsonWallet) {
@@ -34,6 +41,10 @@ const waitForTx = async (provider, hash) => {
     }
 }
 
+const expandDecimals = (amount, decimals = 18) => {
+    return ethers.utils.parseUnits(String(amount), decimals);
+}
+
 const log = (args, msg) => console.log(`[${args.parent._name}/${args._name}] ${msg}`)
 
 module.exports = {
@@ -41,5 +52,6 @@ module.exports = {
     splitCommaList,
     getFunctionBytes,
     waitForTx,
-    log
+    log,
+    expandDecimals
 }

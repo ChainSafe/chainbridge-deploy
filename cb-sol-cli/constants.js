@@ -17,6 +17,7 @@ const ContractABIs = {
 }
 
 module.exports.ContractABIs = ContractABIs
+module.exports.ADMIN_ROLE = "0x0000000000000000000000000000000000000000000000000000000000000000"
 // This is just Alice's key.
 module.exports.deployerAddress = "0xff93B45308FD417dF303D6515aB04D9e89a750Ca";
 module.exports.deployerPrivKey = "0x000000000000000000000000000000000000000000000000000000616c696365";
@@ -27,6 +28,11 @@ module.exports.relayerAddresses = [
     "0x24962717f8fA5BA3b931bACaF9ac03924EB475a0", // Charlie Public Address
     "0x148FfB2074A9e59eD58142822b3eB3fcBffb0cd7", // Dave Public Address
     "0x4CEEf6139f00F9F4535Ad19640Ff7A0137708485", // Eve Public Address
+]
+
+module.exports.adminAddresses = [
+    "0xff93B45308FD417dF303D6515aB04D9e89a750Ca", // Alice Public Address
+    "0x8e0a907331554AF72563Bd8D43051C2E64Be5d35", // Bob Public Address
 ]
 
 module.exports.relayerPrivKeys = [
