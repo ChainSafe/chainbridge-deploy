@@ -91,7 +91,7 @@ const balanceCmd = new Command("balance")
         const erc20Instance = new ethers.Contract(args.erc20Address, constants.ContractABIs.Erc20Mintable.abi, args.wallet);
         const balance = await erc20Instance.balanceOf(args.address)
         const decimals = await erc20Instance.decimals();
-        log(args, `Account ${args.address} has a balance of ${balance / 10 ** decimals}` )
+        log(args, `Account ${args.address} has a balance of ${ethers.utils.formatUnits(balance, decimals)}` )
     })
 
 const allowanceCmd = new Command("allowance")
