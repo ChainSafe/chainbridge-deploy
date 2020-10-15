@@ -18,7 +18,10 @@ async function deployChain(name = null, deployAll = false) {
     chain.encryptedWallet = encryptedWallet;
 
     // Connect wallet to the provider
-    const provider = new ethers.providers.JsonRpcProvider(chain.url);
+    const provider = new ethers.providers.JsonRpcProvider(chain.url, {
+        // TODO Make chain.chainOpts the actual provider information
+        chainId: chain.chainOpts.networkId
+    });
     wallet = wallet.connect(provider);
 
     let existsFlag = false;
@@ -35,6 +38,8 @@ async function deployChain(name = null, deployAll = false) {
             existsFlag = true;
         }
     }
+
+    if (!existsFlag) console.log("Found no existing deployments, starting fresh!");
 
     // We always have to deploy the bridge contract first
     if (chain.contracts.bridge && !chain.contracts.bridge.address) {
@@ -71,6 +76,13 @@ async function deployChain(name = null, deployAll = false) {
     }
     config[selectedChain] = chain;
     updateConfig(config);
+
+    // Ask if the user wishes to deploy this chain
+    const { verify } = await prompts(generic.verify("Do you want to setup the handlers?", ""));
+    if (verify) {
+        await handlerSetup(name);
+    }
+
 }
 
 async function deployContract(contractName, chain, wallet) {

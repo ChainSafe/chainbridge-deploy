@@ -4,6 +4,7 @@ const {updateChain} = require("./updateChain");
 const {addChain} = require("./addChain");
 const {fetchConfig} = require("./helpers");
 const {deployChain} = require("./deployChain");
+const {handlerSetup} = require("./handlerSetup");
 const {deleteChain} = require("./deleteChain");
 
 (async function() {
@@ -23,6 +24,8 @@ const {deleteChain} = require("./deleteChain");
             break;
         case "deleteChain":
             await deleteChain();
+        case "handlerSetup":
+            await handlerSetup();
         case "quit":
             process.exit(0);
     }

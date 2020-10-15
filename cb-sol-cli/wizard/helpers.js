@@ -1,3 +1,4 @@
+const versionNumber = require("../package.json").version;
 const homedir = require('os').homedir();
 const { ethers } = require('ethers');
 const {initial} = require("./questions");
@@ -44,7 +45,10 @@ function updateConfig(config) {
     try {
         if (!fs.existsSync(configDir)){
             fs.mkdirSync(configDir);
+            // If first time config exists, append version number for future migrations
+            config.version = versionNumber;
         }
+        // TODO handle versioning
         fs.writeFileSync(configFullPath, jsonConfig);
         console.log(`Saved configuration file to ${configFullPath}!`);
     } catch (e) {
