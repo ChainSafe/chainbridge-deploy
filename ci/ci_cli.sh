@@ -17,6 +17,7 @@ NEW_ADMIN="0x55f511f91eE0D3368Bd6C2A7A8c1f4E685595b56"
 set -eux
 
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE deploy --all
+$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE deploy --centAsset
 
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 mint --amount 100
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 add-minter
