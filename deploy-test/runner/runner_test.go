@@ -20,7 +20,7 @@ var transferAmount = big.NewInt(100)
 
 func createEthEthConfig(ethABridge, ethAErc20, ethAErc20Handler, ethBBridge, ethBErc20, ethBErc20Handler common.Address, rId msg.ResourceId) *Config {
 	return &Config{
-		Source: Chain{
+		Source: ChainCfg{
 			PrivateKey:   hexutils.BytesToHex(AliceEthKp.Encode()),
 			Type:         "ethereum",
 			Endpoint:     EthAEndpoint,
@@ -29,7 +29,7 @@ func createEthEthConfig(ethABridge, ethAErc20, ethAErc20Handler, ethBBridge, eth
 			Erc20:        ethAErc20,
 			Erc20Handler: ethAErc20Handler,
 		},
-		Destination: Chain{
+		Destination: ChainCfg{
 			PrivateKey:   hexutils.BytesToHex(AliceEthKp.Encode()),
 			Type:         "ethereum",
 			Endpoint:     EthBEndpoint,

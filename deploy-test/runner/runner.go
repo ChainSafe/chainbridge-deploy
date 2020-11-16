@@ -10,7 +10,7 @@ import (
 	log "github.com/ChainSafe/log15"
 )
 
-type Client interface {
+type Chain interface {
 	CreateFungibleDeposit(amount *big.Int, recipient string, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, error)
 	VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce) error
 	WaitForBlock(block *big.Int) error
@@ -24,12 +24,12 @@ type TestFailure struct {
 }
 
 func Start(cfg *Config) ([]TestFailure, error) {
-	// Initialize clients
+	// Initialize chains
 	var err error
 	if cfg.Source.Type == EthereumType {
-		cfg.Source.Client, err = ethereum.NewClient(cfg.Source.Endpoint, cfg.Source.PrivateKey, cfg.Source.Bridge, cfg.Source.Erc20, cfg.Source.Erc20Handler, log.New("chain", "source"))
+		cfg.Source.Chain, err = ethereum.NewChain(cfg.Source.Endpoint, cfg.Source.PrivateKey, cfg.Source.Bridge, cfg.Source.Erc20, cfg.Source.Erc20Handler, log.New("chain", "source"))
 	} else if cfg.Source.Type == SubstrateType {
-		cfg.Source.Client, err = substrate.NewClient(cfg.Source.Endpoint, cfg.Source.PrivateKey)
+		cfg.Source.Chain, err = substrate.NewChain(cfg.Source.Endpoint, cfg.Source.PrivateKey)
 	} else {
 		return nil, fmt.Errorf("unrecognized chain type: %s", cfg.Source.Type)
 	}
@@ -39,9 +39,9 @@ func Start(cfg *Config) ([]TestFailure, error) {
 	}
 
 	if cfg.Destination.Type == EthereumType {
-		cfg.Destination.Client, err = ethereum.NewClient(cfg.Destination.Endpoint, cfg.Source.PrivateKey, cfg.Destination.Bridge, cfg.Destination.Erc20, cfg.Destination.Erc20Handler, log.New("chain", "dest"))
+		cfg.Destination.Chain, err = ethereum.NewChain(cfg.Destination.Endpoint, cfg.Source.PrivateKey, cfg.Destination.Bridge, cfg.Destination.Erc20, cfg.Destination.Erc20Handler, log.New("chain", "dest"))
 	} else if cfg.Destination.Type == SubstrateType {
-		cfg.Destination.Client, err = substrate.NewClient(cfg.Destination.Endpoint, cfg.Source.PrivateKey)
+		cfg.Destination.Chain, err = substrate.NewChain(cfg.Destination.Endpoint, cfg.Source.PrivateKey)
 	} else {
 		return nil, fmt.Errorf("unrecognized chain type: %s", cfg.Source.Type)
 	}

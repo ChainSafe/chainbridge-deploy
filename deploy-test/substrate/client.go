@@ -8,11 +8,11 @@ import (
 	utils "github.com/ChainSafe/ChainBridge/shared/substrate"
 )
 
-type Client struct {
+type Chain struct {
 	client *utils.Client
 }
 
-func NewClient(url string, privateKey string) (*Client, error) {
+func NewChain(url string, privateKey string) (*Chain, error) {
 
 	kp, err := sr25519.NewKeypairFromSeed(privateKey)
 	if err != nil {
@@ -23,23 +23,23 @@ func NewClient(url string, privateKey string) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Client{client: client}, nil
+	return &Chain{client: client}, nil
 }
 
-func (c *Client) GetBalance(addr string) (*big.Int, error) {
+func (c *Chain) GetBalance(addr string) (*big.Int, error) {
 	panic("not implemented")
 }
 
-func (c *Client) CreateFungibleDeposit(amount *big.Int, recipient string, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, error) {
+func (c *Chain) CreateFungibleDeposit(amount *big.Int, recipient string, rId msg.ResourceId, destId msg.ChainId) (msg.Nonce, error) {
 	panic("not implemented")
 }
 
-func (c *Client) VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce) error {
+func (c *Chain) VerifyFungibleProposal(amount *big.Int, recipient string, source msg.ChainId, nonce msg.Nonce) error {
 	panic("not implemented")
 }
 
-func (c *Client) WaitForBlock(block *big.Int) error {
+func (c *Chain) WaitForBlock(block *big.Int) error {
 	panic("not implemented")
 }
 
-func (c *Client) Close() {}
+func (c *Chain) Close() {}

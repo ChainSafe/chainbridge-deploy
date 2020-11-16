@@ -139,7 +139,7 @@ func executeErc20Proposal(t *testing.T, client *utils.Client, bridge common.Addr
 	}
 }
 
-func TestClient_CreateFungibleDeposit(t *testing.T) {
+func TestChain_CreateFungibleDeposit(t *testing.T) {
 	amount := big.NewInt(100)
 	destId := msg.ChainId(1)
 
@@ -156,7 +156,7 @@ func TestClient_CreateFungibleDeposit(t *testing.T) {
 	ethtest.RegisterResource(t, testClient, contracts.BridgeAddress, contracts.ERC20HandlerAddress, rId, erc20Contract)
 
 	// Create client
-	client, err := NewClient(TestEndpoint, AlicePrivKey, contracts.BridgeAddress, erc20Contract, contracts.ERC20HandlerAddress, log.Root())
+	client, err := NewChain(TestEndpoint, AlicePrivKey, contracts.BridgeAddress, erc20Contract, contracts.ERC20HandlerAddress, log.Root())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,7 +171,7 @@ func TestClient_CreateFungibleDeposit(t *testing.T) {
 	verifyDepositEvent(t, testClient, contracts.BridgeAddress, nonce)
 }
 
-func TestClient_VerifyFungibleProposal(t *testing.T) {
+func TestChain_VerifyFungibleProposal(t *testing.T) {
 	amount := big.NewInt(100)
 	srcId := msg.ChainId(0)
 	destId := msg.ChainId(1)
@@ -192,12 +192,12 @@ func TestClient_VerifyFungibleProposal(t *testing.T) {
 	ethtest.RegisterResource(t, testClient, contracts.BridgeAddress, contracts.ERC20HandlerAddress, rId, erc20Contract)
 	ethtest.SetBurnable(t, testClient, contracts.BridgeAddress, contracts.ERC20HandlerAddress, erc20Contract)
 	// Create client
-	client, err := NewClient(TestEndpoint, AlicePrivKey, contracts.BridgeAddress, erc20Contract, contracts.ERC20HandlerAddress, log.Root())
+	client, err := NewChain(TestEndpoint, AlicePrivKey, contracts.BridgeAddress, erc20Contract, contracts.ERC20HandlerAddress, log.Root())
 	if err != nil {
 		t.Fatal(err)
 	}
-	go watchForProposalEvent(client.client, contracts.BridgeAddress)
-	_, err = client.client.Client.BlockByNumber(context.Background(), nil)
+	go watchForProposalEvent(client.ethClient, contracts.BridgeAddress)
+	_, err = client.ethClient.Client.BlockByNumber(context.Background(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}

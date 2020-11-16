@@ -18,7 +18,7 @@ var AliceEthKp = keystore.TestKeyRing.EthereumKeys[keystore.AliceKey]
 var AliceSubKp = keystore.TestKeyRing.SubstrateKeys[keystore.AliceKey]
 
 var exampleConfig = Config{
-	Source: Chain{
+	Source: ChainCfg{
 		PrivateKey: AliceEthKp.CommonAddress().String(),
 		Type:       "ethereum",
 		Endpoint:   "http://localhost:8545",
@@ -26,7 +26,7 @@ var exampleConfig = Config{
 		Bridge:     exampleEthAddr,
 		Erc20:      exampleEthAddr,
 	},
-	Destination: Chain{
+	Destination: ChainCfg{
 		PrivateKey: AliceSubKp.AsKeyringPair().URI,
 		Type:       "substrate",
 		Endpoint:   "http://localhost:9944",

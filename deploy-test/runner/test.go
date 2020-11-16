@@ -20,18 +20,18 @@ type Test struct {
 	ResourceId string   `json:"resourceId"`
 }
 
-func (t *Test) Run(source, dest Chain) error {
+func (t *Test) Run(source, dest ChainCfg) error {
 	rId := msg.ResourceIdFromSlice(hexutils.HexToBytes(t.ResourceId))
 
 	if t.Type == FungibleTest {
 		log.Debug("Creating fungible deposit", "src", source.ChainId, "dest", dest.ChainId, "amount", t.Amount.String(), "recipient", t.Recipient)
-		nonce, err := source.Client.CreateFungibleDeposit(t.Amount, t.Recipient, rId, dest.ChainId)
+		nonce, err := source.Chain.CreateFungibleDeposit(t.Amount, t.Recipient, rId, dest.ChainId)
 		if err != nil {
 			return err
 		}
 
 		log.Debug("Verifying fungible proposal", "src", source.ChainId, "dest", dest.ChainId, "amount", t.Amount.String(), "nonce", nonce)
-		err = dest.Client.VerifyFungibleProposal(t.Amount, t.Recipient, source.ChainId, nonce)
+		err = dest.Chain.VerifyFungibleProposal(t.Amount, t.Recipient, source.ChainId, nonce)
 		if err != nil {
 			return err
 		}

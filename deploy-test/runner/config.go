@@ -15,13 +15,13 @@ var EthereumType ChainType = "ethereum"
 var SubstrateType ChainType = "substrate"
 
 type Config struct {
-	Source      Chain  `json:"source"`
-	Destination Chain  `json:"destination"`
-	Tests       []Test `json:"tests"`
-	Iterations  int    `json:"iterations"`
+	Source      ChainCfg `json:"source"`
+	Destination ChainCfg `json:"destination"`
+	Tests       []Test   `json:"tests"`
+	Iterations  int      `json:"iterations"`
 }
 
-type Chain struct {
+type ChainCfg struct {
 	PrivateKey string      `json:"privateKey"`
 	Type       ChainType   `json:"type"`
 	Endpoint   string      `json:"endpoint"`
@@ -30,7 +30,7 @@ type Chain struct {
 	Bridge       common.Address `json:"bridge"`
 	Erc20        common.Address `json:"erc20"`
 	Erc20Handler common.Address `json:"erc20Handler"`
-	Client       Client
+	Chain        Chain
 }
 
 func LoadConfig(path string) (*Config, error) {

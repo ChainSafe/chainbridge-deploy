@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strconv"
 
@@ -43,9 +42,6 @@ func run(ctx *cli.Context) error {
 		return err
 	}
 	// Pares first argument for path
-	if ctx.NArg() < 1 {
-		return fmt.Errorf("please specify path to config json")
-	}
 	path := ctx.Args().Get(0)
 	if path == "" {
 		return errors.New("must provide path")
