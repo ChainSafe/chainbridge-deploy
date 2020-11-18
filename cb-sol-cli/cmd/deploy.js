@@ -18,6 +18,7 @@ const deployCmd = new Command("deploy")
     .option('--erc20', 'Deploy erc20 contract')
     .option('--erc721', 'Deploy erc721 contract')
     .option('--centAsset', 'Deploy centrifuge asset contract')
+    .option('--weth', 'Deploy wrapped ETH Erc20 contract')
     .option('--config', 'Logs the configuration based on the deployment', false)
     .action(async (args) => {
         await setupParentArgs(args, args.parent)
@@ -30,7 +31,6 @@ const deployCmd = new Command("deploy")
             await deployGenericHandler(args)
             await deployERC20(args)
             await deployERC721(args)
-            await deployCentrifugeAssetStore(args);
         } else {
             let deployed = false
             if (args.bridge) {
@@ -59,6 +59,10 @@ const deployCmd = new Command("deploy")
             }
             if (args.centAsset) {
                 await deployCentrifugeAssetStore(args);
+                deployed = true
+            }
+            if (args.weth) {
+                await deployWETH(args)
                 deployed = true
             }
 
@@ -125,6 +129,8 @@ Erc20:              ${args.erc20Contract ? args.erc20Contract : "Not Deployed"}
 Erc721:             ${args.erc721Contract ? args.erc721Contract : "Not Deployed"}
 ----------------------------------------------------------------
 Centrifuge Asset:   ${args.centrifugeAssetStoreContract ? args.centrifugeAssetStoreContract : "Not Deployed"}
+----------------------------------------------------------------
+WETH:               ${args.WETHContract ? args.WETHContract : "Not Deployed"}
 ================================================================
         `)
 }
@@ -197,6 +203,14 @@ async function deployCentrifugeAssetStore(args) {
     await contract.deployed();
     args.centrifugeAssetStoreContract = contract.address
     console.log("✓ CentrifugeAssetStore contract deployed")
+}
+
+async function deployWETH(args) {
+    const factory = new ethers.ContractFactory(constants.ContractABIs.WETH.abi, constants.ContractABIs.WETH.bytecode, args.wallet);
+    const contract = await factory.deploy({ gasPrice: args.gasPrice, gasLimit: args.gasLimit});
+    await contract.deployed();
+    args.WETHContract = contract.address
+    console.log("✓ WETH contract deployed")
 }
 
 module.exports = deployCmd
