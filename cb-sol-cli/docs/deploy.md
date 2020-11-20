@@ -11,7 +11,7 @@ Selection of contracts can be made by either specifying `--all` or a subset of t
   --erc20                      Deploy erc20 contract
   --erc721                     Deploy erc721 contract
   --centAsset                  Deploy centrifuge asset contract
-  --weth                       Deploy wrapped ETH Erc20 contract
+  --wetc                       Deploy wrapped ETC Erc20 contract
   --config                     Logs the configuration based on the deployment
 ```
 

@@ -18,6 +18,7 @@ set -eux
 
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE deploy --all
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE deploy --centAsset
+$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE deploy --wetc
 
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 mint --amount 100
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 add-minter
