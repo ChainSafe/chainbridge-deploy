@@ -16,6 +16,8 @@ const deployCmd = new Command("deploy")
     .option('--erc721Handler', 'Deploy erc721Handler contract')
     .option('--genericHandler', 'Deploy genericHandler contract')
     .option('--erc20', 'Deploy erc20 contract')
+    .option('--erc20Symbol <symbol>', 'Name for the erc20 contract', "")
+    .option('--erc20Name <name>', 'Symbol for the erc20 contract', "")
     .option('--erc721', 'Deploy erc721 contract')
     .option('--centAsset', 'Deploy centrifuge asset contract')
     .option('--wetc', 'Deploy wrapped ETC Erc20 contract')
@@ -148,7 +150,6 @@ async function deployBridgeContract(args) {
         ethers.utils.parseEther(args.fee.toString()),
         args.expiry,
         { gasPrice: args.gasPrice, gasLimit: args.gasLimit}
-
     );
     await contract.deployed();
     args.bridgeContract = contract.address
@@ -157,7 +158,7 @@ async function deployBridgeContract(args) {
 
 async function deployERC20(args) {
     const factory = new ethers.ContractFactory(constants.ContractABIs.Erc20Mintable.abi, constants.ContractABIs.Erc20Mintable.bytecode, args.wallet);
-    const contract = await factory.deploy("", "", { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
+    const contract = await factory.deploy(args.erc20Name, args.erc20Symbol, { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
     await contract.deployed();
     args.erc20Contract = contract.address
     console.log("✓ ERC20 contract deployed")
