@@ -1,7 +1,7 @@
 get-lint:
 	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s latest
 
-.PHONY: lint
+.PHONY: lint build
 lint:
 	if [ ! -f ./bin/golangci-lint ]; then \
 		$(MAKE) get-lint; \
@@ -10,3 +10,9 @@ lint:
 
 test:
 	go test ./...
+
+build:
+	cd cmd/ && go build -o ../build/deploy-test
+
+docker-test:
+	./docker/run_geth_and_relayers.sh

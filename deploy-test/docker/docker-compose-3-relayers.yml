@@ -1,0 +1,25 @@
+version: '3'
+services:
+  relayerA:
+    image: "chainsafe/chainbridge:v1.0.0"
+    container_name: relayerA
+    command: --verbosity trace --config /config/config0.json --testkey alice
+    volumes:
+      - ./config:/config
+    network_mode: host
+
+  relayerB:
+    image: "chainsafe/chainbridge:v1.0.0"
+    container_name: relayerB
+    command: --verbosity trace --config /config/config1.json --testkey bob
+    volumes:
+      - ./config:/config
+    network_mode: host
+
+  relayerC:
+    image: "chainsafe/chainbridge:v1.0.0"
+    container_name: relayerC
+    command: --verbosity trace --config /config/config2.json --testkey charlie
+    volumes:
+      - ./config:/config
+    network_mode: host
