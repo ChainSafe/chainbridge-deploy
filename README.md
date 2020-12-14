@@ -8,6 +8,10 @@ Please see the [README](/cfgBuilder/README.md).
 
 Please see the [README](/cb-sol-cli/README.md).
 
+## deploy-test
+
+Please see the [README](/deploy-test/README.md).
+
 # ChainSafe Security Policy
 
 ## Reporting a Security Bug

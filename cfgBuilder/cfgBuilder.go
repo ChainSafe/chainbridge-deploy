@@ -48,6 +48,7 @@ type Opts struct {
 	GenericHandler string `json:"genericHandler,omitempty"`
 	GasLimit       string `json:"gasLimit,omitempty"`
 	MaxGasPrice    string `json:"maxGasPrice,omitempty"`
+	GasMultiplier  string `json:"gasMultiplier,omitempty"`
 	StartBlock     string `json:"startBlock"`
 	Http           string `json:"http,omitempty"`
 }
@@ -62,6 +63,7 @@ type EthChainConfig struct {
 	GenericHandler string   `json:"genericHandler"`
 	GasLimit       string   `json:"gasLimit"`
 	MaxGasPrice    string   `json:"maxGasPrice"`
+	GasMultiplier  string   `json:"gasMultiplier"`
 	StartBlock     string   `json:"startBlock"`
 	Http           string   `json:"http"`
 	Relayers       []string `json:"relayers"`
@@ -116,6 +118,7 @@ func constructEthChainConfig(cfg EthChainConfig, relayer string) RawChainConfig 
 			GenericHandler: cfg.GenericHandler,
 			GasLimit:       cfg.GasLimit,
 			MaxGasPrice:    cfg.MaxGasPrice,
+			GasMultiplier:  cfg.GasMultiplier,
 			StartBlock:     cfg.StartBlock,
 			Http:           cfg.Http,
 		},

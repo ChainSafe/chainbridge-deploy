@@ -6,26 +6,30 @@ import (
 
 	msg "github.com/ChainSafe/ChainBridge/message"
 	utils "github.com/ChainSafe/ChainBridge/shared/ethereum"
+	log "github.com/ChainSafe/log15"
 	"github.com/ethereum/go-ethereum/common"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
 )
 
 var Erc20TransferEvent utils.EventSig = "Transfer(address,address,uint256)"
 
-func isExpectedEvent(evt ethtypes.Log, expectedNonce msg.Nonce, expectedSourceId msg.ChainId, expectedStatus *big.Int) bool {
+func isExpectedProposalEvent(evt ethtypes.Log, expectedNonce msg.Nonce, expectedSourceId msg.ChainId, expectedStatus *big.Int) bool {
 	sourceId := evt.Topics[1].Big()
 	nonce := evt.Topics[2].Big()
 	status := evt.Topics[3].Big()
 
 	if nonce.Cmp(big.NewInt(int64(expectedNonce))) != 0 {
+		log.Trace("Ignoring proposal event, unexpected nonce", "expected", expectedNonce, "actual", nonce.String())
 		return false
 	}
 
 	if sourceId.Cmp(big.NewInt(int64(expectedSourceId))) != 0 {
+		log.Trace("Ignoring proposal event, unexpected source ID", "expected", expectedSourceId, "actual", sourceId.String())
 		return false
 	}
 
 	if status.Cmp(expectedStatus) != 0 {
+		log.Trace("Ignoring proposal event, unexpected status", "expected", expectedStatus, "actual", status.String())
 		return false
 	}
 	return true
@@ -43,4 +47,17 @@ func isExpectedErc20Event(evt ethtypes.Log, expectedAmount *big.Int, expectedRec
 	}
 
 	return true, nil
+}
+
+func statusString(status uint64) string {
+	if utils.ProposalStatus(status) == utils.Active {
+		return "Active"
+	}
+	if utils.ProposalStatus(status) == utils.Passed {
+		return "Passed"
+	}
+	if utils.ProposalStatus(status) == utils.Executed {
+		return "Executed"
+	}
+	return fmt.Sprintf("unknown status: %d", status)
 }

@@ -22,10 +22,8 @@ var TestEndpoint = "ws://localhost:8545"
 var AliceKp = keystore.TestKeyRing.EthereumKeys[keystore.AliceKey]
 var AlicePrivKey = hexutils.BytesToHex(AliceKp.Encode())
 
-func verifyDepositEvent(t *testing.T, client *utils.Client, block *big.Int, bridge common.Address, expectedNonce msg.Nonce) {
+func verifyDepositEvent(t *testing.T, client *utils.Client, bridge common.Address, expectedNonce msg.Nonce) {
 	query := ethereum.FilterQuery{
-		FromBlock: block,
-		ToBlock:   block,
 		Addresses: []common.Address{bridge},
 		Topics: [][]common.Hash{
 			{utils.Deposit.GetTopic()},
@@ -62,9 +60,7 @@ func constructErc20ProposalData(amount []byte, recipient []byte) []byte {
 }
 
 //TODO: REMOVE
-func watchEvent(client *utils.Client, bridge common.Address) {
-	fmt.Printf("Watching for event:")
-
+func watchForProposalEvent(client *utils.Client, bridge common.Address) {
 	query := ethereum.FilterQuery{
 		FromBlock: big.NewInt(0),
 		Addresses: []common.Address{bridge},
@@ -143,7 +139,7 @@ func executeErc20Proposal(t *testing.T, client *utils.Client, bridge common.Addr
 	}
 }
 
-func TestClient_CreateFungibleDeposit(t *testing.T) {
+func TestChain_CreateFungibleDeposit(t *testing.T) {
 	amount := big.NewInt(100)
 	destId := msg.ChainId(1)
 
@@ -160,22 +156,22 @@ func TestClient_CreateFungibleDeposit(t *testing.T) {
 	ethtest.RegisterResource(t, testClient, contracts.BridgeAddress, contracts.ERC20HandlerAddress, rId, erc20Contract)
 
 	// Create client
-	client, err := NewClient(TestEndpoint, AlicePrivKey, contracts.BridgeAddress, erc20Contract, log.Root())
+	client, err := NewChain(TestEndpoint, AlicePrivKey, contracts.BridgeAddress, erc20Contract, contracts.ERC20HandlerAddress, log.Root())
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Create deposit
 
-	nonce, blockNum, err := client.CreateFungibleDeposit(amount, AliceKp.CommonAddress().Hex(), rId, destId)
+	nonce, err := client.CreateFungibleDeposit(amount, AliceKp.CommonAddress().Hex(), rId, destId)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Verify deposit
-	verifyDepositEvent(t, testClient, blockNum, contracts.BridgeAddress, nonce)
+	verifyDepositEvent(t, testClient, contracts.BridgeAddress, nonce)
 }
 
-func TestClient_VerifyFungibleProposal(t *testing.T) {
+func TestChain_VerifyFungibleProposal(t *testing.T) {
 	amount := big.NewInt(100)
 	srcId := msg.ChainId(0)
 	destId := msg.ChainId(1)
@@ -196,12 +192,12 @@ func TestClient_VerifyFungibleProposal(t *testing.T) {
 	ethtest.RegisterResource(t, testClient, contracts.BridgeAddress, contracts.ERC20HandlerAddress, rId, erc20Contract)
 	ethtest.SetBurnable(t, testClient, contracts.BridgeAddress, contracts.ERC20HandlerAddress, erc20Contract)
 	// Create client
-	client, err := NewClient(TestEndpoint, AlicePrivKey, contracts.BridgeAddress, erc20Contract, log.Root())
+	client, err := NewChain(TestEndpoint, AlicePrivKey, contracts.BridgeAddress, erc20Contract, contracts.ERC20HandlerAddress, log.Root())
 	if err != nil {
 		t.Fatal(err)
 	}
-	go watchEvent(client.client, contracts.BridgeAddress)
-	startBlock, err := client.client.Client.BlockByNumber(context.Background(), nil)
+	go watchForProposalEvent(client.ethClient, contracts.BridgeAddress)
+	_, err = client.ethClient.Client.BlockByNumber(context.Background(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -211,7 +207,7 @@ func TestClient_VerifyFungibleProposal(t *testing.T) {
 	voteOnErc20Proposal(t, testClient, contracts.BridgeAddress, srcId, nonce, rId, utils.Hash(append(contracts.ERC20HandlerAddress.Bytes(), data...)))
 	executeErc20Proposal(t, testClient, contracts.BridgeAddress, srcId, nonce, data, rId)
 
-	err = client.VerifyFungibleProposal(amount, recipient.String(), srcId, nonce, startBlock.Number())
+	err = client.VerifyFungibleProposal(amount, recipient.String(), srcId, nonce)
 	if err != nil {
 		t.Fatal(err)
 	}
