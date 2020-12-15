@@ -22,6 +22,8 @@ program.option('--jsonWalletPassword <value>', '(Optional) Password for encrypte
 program.option('--gasLimit <value>', "Gas limit for transactions", "8000000")
 program.option('--gasPrice <value>', "Gas limit for transactions", "20000000")
 program.option('--networkId <value>', "Network Id")
+program.option('--networkType <value>', "Network Type", 'ethereum')
+program.option('--network <value>', "Network", 'gorli') //ethereum -> [gorli | mainnet]
 
 program.addCommand(deploy)
 program.addCommand(bridge)

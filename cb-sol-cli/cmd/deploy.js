@@ -1,11 +1,13 @@
+const assert = require('assert')
 const ethers = require('ethers');
 const {Command} = require('commander');
 const constants = require('../constants');
-const {setupParentArgs, splitCommaList} = require("./utils")
+const {setupParentArgs, splitCommaList, waitForTx} = require("./utils")
 
 const deployCmd = new Command("deploy")
     .description("Deploys contracts via RPC")
     .option('--chainId <value>', 'Chain ID for the instance', constants.DEFAULT_SOURCE_ID)
+    .option('--multiSig <value>', 'Address of Multi-sig which will act as bridge admin')
     .option('--relayers <value>', 'List of initial relayers', splitCommaList, constants.relayerAddresses)
     .option('--relayerThreshold <value>', 'Number of votes required for a proposal to pass', 2)
     .option('--fee <ether>', 'Fee to be taken when making a deposit (decimals allowed)', 0)
@@ -137,6 +139,7 @@ WETH:               ${args.WETHContract ? args.WETHContract : "Not Deployed"}
 
 
 async function deployBridgeContract(args) {
+    assert(args.multiSig, 'Missing multi-sig address')
     // Create an instance of a Contract Factory
     let factory = new ethers.ContractFactory(constants.ContractABIs.Bridge.abi, constants.ContractABIs.Bridge.bytecode, args.wallet);
 
@@ -150,7 +153,11 @@ async function deployBridgeContract(args) {
         { gasPrice: args.gasPrice, gasLimit: args.gasLimit}
 
     );
-    await contract.deployed();
+    const bridgeInstance = await contract.deployed();
+
+    let tx = await bridgeInstance.renounceAdmin(args.multiSig)
+    await waitForTx(args.provider, tx.hash)
+
     args.bridgeContract = contract.address
     console.log("✓ Bridge contract deployed")
 }

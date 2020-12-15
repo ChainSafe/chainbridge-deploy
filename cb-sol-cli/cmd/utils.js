@@ -1,5 +1,9 @@
+const assert = require('assert')
 const ethers = require('ethers');
 const fs = require('fs');
+const getSafeToolchain = require('gnosis-safe-toolchain')
+const encodeFunctionData = require('gnosis-safe-toolchain/src/util/encode-function-data')
+const constants = require('../constants');
 
 const setupParentArgs = async (args, parent) => {
     args.url= parent.url
@@ -20,6 +24,28 @@ const setupParentArgs = async (args, parent) => {
         const keyfile = JSON.parse(raw);
         args.wallet = await ethers.Wallet.fromEncryptedJson(keyfile, parent.jsonWalletPassword)
     }
+}
+
+const safeSetupParentArgs = async (args, parent) => {
+    await setupParentArgs(args, parent)
+
+    assert(typeof parent.networkType !== 'undefined', "Missing networkType")
+    assert(['ethereum', 'avalanche'].includes(parent.networkType), "Wrong networkType")
+    assert(['gorli', 'mainnet'].includes(parent.network), "Wrong network")
+
+    let networkId = 1
+    if (parent.networkType && parent.network === 'gorli') {
+        networkId = 5
+    }
+
+    args.safeToolchain = getSafeToolchain({
+        rpcUrl: args.url,
+        walletPk: parent.privateKey,
+        gasPrice: parent.gasPrice,
+        networkType: parent.networkType,
+        networkId: networkId,
+        // logger: true
+      })
 }
 
 const splitCommaList = (str) => {
@@ -47,11 +73,44 @@ const expandDecimals = (amount, decimals = 18) => {
 
 const log = (args, msg) => console.log(`[${args.parent._name}/${args._name}] ${msg}`)
 
+const safeTransactionAppoveExecute = async (args, functionName, params =[]) => {
+    const { bridge, safeToolchain, multiSig, approve, provider, execute, approvers } = args
+    const encodedFuntionData = encodeFunctionData(constants.ContractABIs.Bridge.abi, bridge, safeToolchain.wallet, functionName, params)
+
+    const { transactionHash, txData} = await safeToolchain.commands.transactionData(multiSig, {
+        to: bridge,
+        value: '0',
+        data: encodedFuntionData,
+        operation: 0 // CALL
+    })
+
+    console.log('transactionHash', transactionHash)
+    console.log('txData', txData)
+
+    // approve transaction
+    if (approve) {
+        const tx = await safeToolchain.commands.approveHash(multiSig, transactionHash)
+        await waitForTx(provider, tx.hash)
+    } else if (execute) {
+        assert(approvers.length, 'Missing approvers')
+        const tx = await safeToolchain.commands.executeTransaction(
+            multiSig,
+            {
+                ...txData,
+                approvers: approvers
+            }
+        )
+        await waitForTx(provider, tx.hash)
+    }
+}
+
 module.exports = {
     setupParentArgs,
+    safeSetupParentArgs,
     splitCommaList,
     getFunctionBytes,
     waitForTx,
     log,
-    expandDecimals
+    expandDecimals,
+    safeTransactionAppoveExecute
 }
