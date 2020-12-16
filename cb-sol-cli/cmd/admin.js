@@ -2,7 +2,7 @@ const ethers = require('ethers');
 const constants = require('../constants');
 
 const {Command} = require('commander');
-const {setupParentArgs, safeSetupParentArgs, safeTransactionAppoveExecute, splitCommaList, waitForTx, log} = require("./utils")
+const {setupParentArgs, safeSetupParentArgs, safeTransactionAppoveExecute, splitCommaList, waitForTx, log, logSafe} = require("./utils")
 
 const isRelayerCmd = new Command("is-relayer")
     .description("Check if address is relayer")
@@ -62,7 +62,7 @@ const safeAddAdminCmd = new Command("safe-add-admin")
   .action(async function (args) {
     await safeSetupParentArgs(args, args.parent.parent)
 
-    log(args, `Adding ${args.admin} as a admin.`)
+    logSafe(args, `Adding ${args.admin} as a admin.`)
 
     await safeTransactionAppoveExecute(args, 'grantRole', [constants.ADMIN_ROLE, args.admin])
   })
@@ -90,7 +90,7 @@ const safeRemoveAdminCmd = new Command("safe-remove-admin")
   .action(async function (args) {
     await safeSetupParentArgs(args, args.parent.parent)
 
-    log(args, `Removing ${args.admin} as a admin.`)
+    logSafe(args, `Removing ${args.admin} as a admin.`)
 
     await safeTransactionAppoveExecute(args, 'revokeRole', [constants.ADMIN_ROLE, args.admin])
   })
@@ -118,7 +118,7 @@ const safeAddRelayerCmd = new Command("safe-add-relayer")
     .action(async function (args) {
         await safeSetupParentArgs(args, args.parent.parent)
 
-        log(args, `Adding ${args.relayer} as a relayer.`)
+        logSafe(args, `Adding ${args.relayer} as a relayer.`)
 
         await safeTransactionAppoveExecute(args, 'adminAddRelayer', [args.relayer])
     })
@@ -146,7 +146,7 @@ const safeRemoveRelayerCmd = new Command("safe-remove-relayer")
     .action(async function (args) {
         await safeSetupParentArgs(args, args.parent.parent)
 
-        log(args, `Removing relayer ${args.relayer}.`)
+        logSafe(args, `Removing relayer ${args.relayer}.`)
 
         await safeTransactionAppoveExecute(args, 'adminRemoveRelayer', [args.relayer])
     })
@@ -172,7 +172,7 @@ const safePauseTransfersCmd = new Command("safe-pause")
     .action(async function (args) {
         await safeSetupParentArgs(args, args.parent.parent)
 
-        log(args, `Pausing deposits and proposals`)
+        logSafe(args, `Pausing deposits and proposals`)
 
         await safeTransactionAppoveExecute(args, 'adminPauseTransfers',[])
     })
@@ -198,7 +198,7 @@ const safeUnpauseTransfersCmd = new Command("safe-unpause")
     .action(async function (args) {
         await safeSetupParentArgs(args, args.parent.parent)
 
-        log(args, `Unpausing deposits and proposals`)
+        logSafe(args, `Unpausing deposits and proposals`)
 
         await safeTransactionAppoveExecute(args, 'adminUnpauseTransfers',[])
     })
@@ -227,7 +227,7 @@ const safeSetThresholdCmd = new Command("safe-set-threshold")
     .action(async function (args) {
         await safeSetupParentArgs(args, args.parent.parent)
 
-        log(args, `Setting relayer threshold to ${args.threshold}`)
+        logSafe(args, `Setting relayer threshold to ${args.threshold}`)
 
         await safeTransactionAppoveExecute(args, 'adminChangeRelayerThreshold',[args.threshold])
     })
@@ -255,7 +255,7 @@ const safeChangeFeeCmd = new Command("safe-set-fee")
     .action(async function (args) {
         await safeSetupParentArgs(args, args.parent.parent)
 
-        log(args, `Setting fee to ${args.fee} wei`)
+        logSafe(args, `Setting fee to ${args.fee} wei`)
 
         await safeTransactionAppoveExecute(args, 'adminChangeFee',[args.fee])
     })
@@ -289,7 +289,7 @@ const safeWithdrawCmd = new Command("safe-withdraw")
     .action(async function (args) {
         await safeSetupParentArgs(args, args.parent.parent)
 
-        log(args, `Withdrawing tokens (${args.amountOrId}) in contract ${args.tokenContract} to recipient ${args.recipient}`)
+        logSafe(args, `Withdrawing tokens (${args.amountOrId}) in contract ${args.tokenContract} to recipient ${args.recipient}`)
 
         await safeTransactionAppoveExecute(args, 'adminWithdraw',[args.handler, args.tokenContract, args.recipient, args.amountOrId])
     })

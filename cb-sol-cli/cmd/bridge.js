@@ -2,7 +2,7 @@ const ethers = require('ethers');
 const constants = require('../constants');
 
 const {Command} = require('commander');
-const {setupParentArgs, getFunctionBytes, safeSetupParentArgs, safeTransactionAppoveExecute, splitCommaList, waitForTx, log} = require("./utils")
+const {setupParentArgs, getFunctionBytes, safeSetupParentArgs, safeTransactionAppoveExecute, splitCommaList, waitForTx, log, logSafe} = require("./utils")
 
 const EMPTY_SIG = "0x00000000"
 
@@ -34,7 +34,7 @@ const safeRegisterResourceCmd = new Command("safe-register-resource")
     .action(async function (args) {
         await safeSetupParentArgs(args, args.parent.parent)
 
-        log(args,`Registering contract ${args.targetContract} with resource ID ${args.resourceId} on handler ${args.handler}`);
+        logSafe(args,`Registering contract ${args.targetContract} with resource ID ${args.resourceId} on handler ${args.handler}`);
 
         await safeTransactionAppoveExecute(args, 'adminSetResource', [args.handler, args.resourceId, args.targetContract])
     })
@@ -84,7 +84,7 @@ const safeRegisterGenericResourceCmd = new Command("safe-register-generic-resour
             args.execute = getFunctionBytes(args.execute)
         }
 
-        log(args,`Registering generic resource ID ${args.resourceId} with contract ${args.targetContract} on handler ${args.handler}`)
+        logSafe(args,`Registering generic resource ID ${args.resourceId} with contract ${args.targetContract} on handler ${args.handler}`)
 
         await safeTransactionAppoveExecute(args, 'adminSetGenericResource', [args.handler, args.resourceId, args.targetContract, args.deposit, args.execute])
     })
@@ -115,7 +115,7 @@ const safesetBurnCmd = new Command("sefe-set-burn")
     .action(async function (args) {
         await safeSetupParentArgs(args, args.parent.parent)
 
-        log(args,`Setting contract ${args.tokenContract} as burnable on handler ${args.handler}`);
+        logSafe(args,`Setting contract ${args.tokenContract} as burnable on handler ${args.handler}`);
 
         await safeTransactionAppoveExecute(args, 'adminSetBurnable', [args.handler, args.tokenContract])
     })
@@ -146,7 +146,7 @@ const safeCancelProposalCmd = new Command("safe-cancel-proposal")
     .action(async function (args) {
         await safeSetupParentArgs(args, args.parent.parent)
 
-        log(args, `Setting proposal with chain ID ${args.chainId} and deposit nonce ${args.depositNonce} status to 'Cancelled`);
+        logSafe(args, `Setting proposal with chain ID ${args.chainId} and deposit nonce ${args.depositNonce} status to 'Cancelled`);
 
         await safeTransactionAppoveExecute(args, 'adminCancelProposal', [args.chainId, args.depositNonce])
     })

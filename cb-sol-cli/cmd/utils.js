@@ -104,6 +104,18 @@ const safeTransactionAppoveExecute = async (args, functionName, params =[]) => {
     }
 }
 
+const { GETTING_MULTISIG_TRANSACTION, APPROVING_MULTISIG_TRANSACTION, EXECUTING_MULTISIG_TRANSACTION } = constants
+const logSafe = (args, msg) => {
+    const { approve, execute } = args
+    const action = approve
+        ? APPROVING_MULTISIG_TRANSACTION
+        : execute
+            ? EXECUTING_MULTISIG_TRANSACTION
+            : GETTING_MULTISIG_TRANSACTION
+
+    log(args, `${action}${msg}`)
+}
+
 module.exports = {
     setupParentArgs,
     safeSetupParentArgs,
@@ -111,6 +123,7 @@ module.exports = {
     getFunctionBytes,
     waitForTx,
     log,
+    logSafe,
     expandDecimals,
     safeTransactionAppoveExecute
 }
