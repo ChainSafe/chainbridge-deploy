@@ -2,12 +2,11 @@ const assert = require('assert')
 const ethers = require('ethers');
 const {Command} = require('commander');
 const constants = require('../constants');
-const {setupParentArgs, splitCommaList, waitForTx} = require("./utils")
+const {setupParentArgs, safeSetupParentArgs, splitCommaList, waitForTx} = require("./utils")
 
 const deployCmd = new Command("deploy")
     .description("Deploys contracts via RPC")
     .option('--chainId <value>', 'Chain ID for the instance', constants.DEFAULT_SOURCE_ID)
-    .option('--multiSig <value>', 'Address of Multi-sig which will act as bridge admin')
     .option('--relayers <value>', 'List of initial relayers', splitCommaList, constants.relayerAddresses)
     .option('--relayerThreshold <value>', 'Number of votes required for a proposal to pass', 2)
     .option('--fee <ether>', 'Fee to be taken when making a deposit (decimals allowed)', 0)
@@ -22,11 +21,16 @@ const deployCmd = new Command("deploy")
     .option('--centAsset', 'Deploy centrifuge asset contract')
     .option('--weth', 'Deploy wrapped ETH Erc20 contract')
     .option('--config', 'Logs the configuration based on the deployment', false)
+    .option('--multiSig', 'Deploy multi-sig which will act as bridge admin')
+    .option('--multiSigAddress <value>', 'Address of Multi-sig which will act as bridge admin')
     .action(async (args) => {
         await setupParentArgs(args, args.parent)
         let startBal = await args.provider.getBalance(args.wallet.address)
         console.log("Deploying contracts...")
         if(args.all) {
+            if (args.multiSig) {
+                await deployMultiSig(args)
+            }
             await deployBridgeContract(args);
             await deployERC20Handler(args);
             await deployERC721Handler(args)
@@ -35,6 +39,9 @@ const deployCmd = new Command("deploy")
             await deployERC721(args)
         } else {
             let deployed = false
+            if (args.multiSig) {
+                await deployMultiSig(args)
+            }
             if (args.bridge) {
                 await deployBridgeContract(args);
                 deployed = true
@@ -118,6 +125,8 @@ Expiry:      ${args.expiry}
 
 Contract Addresses
 ================================================================
+Multi-sig:          ${args.multiSigAddress ? args.multiSigAddress : "Not Deployed"}
+----------------------------------------------------------------
 Bridge:             ${args.bridgeContract ? args.bridgeContract : "Not Deployed"}
 ----------------------------------------------------------------
 Erc20 Handler:      ${args.erc20HandlerContract ? args.erc20HandlerContract : "Not Deployed"}
@@ -138,8 +147,16 @@ WETH:               ${args.WETHContract ? args.WETHContract : "Not Deployed"}
 }
 
 
+async function deployMultiSig(args) {
+    await safeSetupParentArgs(args, args.parent)
+    const safeAddress = await args.safeToolchain.commands.deploy(args.relayers, args.relayerThreshold)
+
+    args.multiSigAddress = safeAddress
+
+    console.log("✓ Multi-sig contract deployed")
+}
+
 async function deployBridgeContract(args) {
-    assert(args.multiSig, 'Missing multi-sig address')
     // Create an instance of a Contract Factory
     let factory = new ethers.ContractFactory(constants.ContractABIs.Bridge.abi, constants.ContractABIs.Bridge.bytecode, args.wallet);
 
@@ -155,8 +172,11 @@ async function deployBridgeContract(args) {
     );
     const bridgeInstance = await contract.deployed();
 
-    let tx = await bridgeInstance.renounceAdmin(args.multiSig)
-    await waitForTx(args.provider, tx.hash)
+    // If multi-sig was deployed or passed as parameter, set as THE admin
+    if (args.multiSigAddress) {
+        let tx = await bridgeInstance.renounceAdmin(args.multiSigAddress)
+        await waitForTx(args.provider, tx.hash)
+    }
 
     args.bridgeContract = contract.address
     console.log("✓ Bridge contract deployed")

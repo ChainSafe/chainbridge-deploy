@@ -1,4 +1,3 @@
-const assert = require('assert')
 const ethers = require('ethers');
 const constants = require('../constants');
 
@@ -28,7 +27,19 @@ const isAdminCmd = new Command("is-admin")
     console.log(`[${args._name}] Address ${args.admin} ${res ? "is" : "is not"} a admin.`)
   })
 
-const addAdminCmd = new Command("add-admin")
+const renounceAdminCmd = new Command("renounce-admin")
+  .description("Admin renounce and set a new admin")
+  .option('--newAdmin <address>', 'Address of new admin', constants.adminAddresses[0])
+  .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
+  .action(async function (args) {
+    await setupParentArgs(args, args.parent.parent)
+    const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
+    log(args, `Adding ${args.newAdmin} as the new admin.`)
+    let tx = await bridgeInstance.renounceAdmin(args.newAdmin)
+    await waitForTx(args.provider, tx.hash)
+  })
+
+  const addAdminCmd = new Command("add-admin")
   .description("Adds an admin")
   .option('--admin <address>', 'Address of admin', constants.adminAddresses[0])
   .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
@@ -49,11 +60,11 @@ const safeAddAdminCmd = new Command("safe-add-admin")
   .option('--execute', 'Execute transaction hash')
   .option('--approvers <value>', 'Approvers addresses', splitCommaList)
   .action(async function (args) {
-    await setupParentArgs(args, args.parent.parent)
+    await safeSetupParentArgs(args, args.parent.parent)
 
     log(args, `Adding ${args.admin} as a admin.`)
 
-    await safeTransactionAppoveExecute(args, grantRole, [constants.ADMIN_ROLE, args.admin])
+    await safeTransactionAppoveExecute(args, 'grantRole', [constants.ADMIN_ROLE, args.admin])
   })
 
 const removeAdminCmd = new Command("remove-admin")
@@ -77,7 +88,7 @@ const safeRemoveAdminCmd = new Command("safe-remove-admin")
   .option('--execute', 'Execute transaction hash')
   .option('--approvers <value>', 'Approvers addresses', splitCommaList)
   .action(async function (args) {
-    await setupParentArgs(args, args.parent.parent)
+    await safeSetupParentArgs(args, args.parent.parent)
 
     log(args, `Removing ${args.admin} as a admin.`)
 
@@ -105,7 +116,7 @@ const safeAddRelayerCmd = new Command("safe-add-relayer")
     .option('--execute', 'Execute transaction hash')
     .option('--approvers <value>', 'Approvers addresses', splitCommaList)
     .action(async function (args) {
-        await setupParentArgs(args, args.parent.parent)
+        await safeSetupParentArgs(args, args.parent.parent)
 
         log(args, `Adding ${args.relayer} as a relayer.`)
 
@@ -133,7 +144,7 @@ const safeRemoveRelayerCmd = new Command("safe-remove-relayer")
     .option('--execute', 'Execute transaction hash')
     .option('--approvers <value>', 'Approvers addresses', splitCommaList)
     .action(async function (args) {
-        await setupParentArgs(args, args.parent.parent)
+        await safeSetupParentArgs(args, args.parent.parent)
 
         log(args, `Removing relayer ${args.relayer}.`)
 
@@ -159,7 +170,7 @@ const safePauseTransfersCmd = new Command("safe-pause")
     .option('--execute', 'Execute transaction hash')
     .option('--approvers <value>', 'Approvers addresses', splitCommaList)
     .action(async function (args) {
-        await setupParentArgs(args, args.parent.parent)
+        await safeSetupParentArgs(args, args.parent.parent)
 
         log(args, `Pausing deposits and proposals`)
 
@@ -185,7 +196,7 @@ const safeUnpauseTransfersCmd = new Command("safe-unpause")
     .option('--execute', 'Execute transaction hash')
     .option('--approvers <value>', 'Approvers addresses', splitCommaList)
     .action(async function (args) {
-        await setupParentArgs(args, args.parent.parent)
+        await safeSetupParentArgs(args, args.parent.parent)
 
         log(args, `Unpausing deposits and proposals`)
 
@@ -276,7 +287,7 @@ const safeWithdrawCmd = new Command("safe-withdraw")
     .option('--execute', 'Execute transaction hash')
     .option('--approvers <value>', 'Approvers addresses', splitCommaList)
     .action(async function (args) {
-        await setupParentArgs(args, args.parent.parent)
+        await safeSetupParentArgs(args, args.parent.parent)
 
         log(args, `Withdrawing tokens (${args.amountOrId}) in contract ${args.tokenContract} to recipient ${args.recipient}`)
 
@@ -289,6 +300,7 @@ adminCmd.addCommand(isRelayerCmd)
 adminCmd.addCommand(isAdminCmd)
 adminCmd.addCommand(addAdminCmd)
 adminCmd.addCommand(safeAddAdminCmd)
+adminCmd.addCommand(renounceAdminCmd)
 adminCmd.addCommand(removeAdminCmd)
 adminCmd.addCommand(safeRemoveAdminCmd)
 adminCmd.addCommand(addRelayerCmd)
