@@ -13,6 +13,8 @@ Selection of contracts can be made by either specifying `--all` or a subset of t
   --centAsset                  Deploy centrifuge asset contract
   --weth                       Deploy wrapped ETH Erc20 contract
   --config                     Logs the configuration based on the deployment
+  --multiSig                   Deploy multi-sig and set as bridge admin
+  --multiSigAddress <address>  Existing multi-sig address to be set as bridge admin
 ```
 
 If you are deploying the Bridge contract, you may want to specify these options as well:
