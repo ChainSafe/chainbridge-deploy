@@ -30,10 +30,10 @@ const safeSetupParentArgs = async (args, parent) => {
 
     assert(typeof parent.networkType !== 'undefined', "Missing networkType")
     assert(['ethereum', 'avalanche'].includes(parent.networkType), "Wrong networkType")
-    assert(['gorli', 'mainnet'].includes(parent.network), "Wrong network")
+    assert(['goerli', 'mainnet'].includes(parent.network), "Wrong network")
 
     let networkId = 1
-    if (parent.networkType && parent.network === 'gorli') {
+    if (parent.networkType && parent.network === 'goerli') {
         networkId = 5
     }
 
@@ -91,7 +91,7 @@ const safeTransactionAppoveExecute = async (args, functionName, params =[]) => {
         const tx = await safeToolchain.commands.approveHash(multiSig, transactionHash)
         await waitForTx(provider, tx.hash)
     } else if (execute) {
-        assert(approvers.length, 'Missing approvers')
+        assert(approvers && approvers.length, 'Missing approvers')
         const tx = await safeToolchain.commands.executeTransaction(
             multiSig,
             {

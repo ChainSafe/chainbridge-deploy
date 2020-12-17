@@ -105,10 +105,12 @@ Removes an admin
 When the admin is a Gnosis Safe multi-sig contract all the commads should be executed using `--privateKey` of the multi-sig owner, adding the following parameters:
 
 ```
---multiSig <value> Address of Multi-sig which will act as bridge admin
---approve Approve transaction hash
---execute Execute transaction
---approvers <value> Approvers addresses
+--networkType <value> Network Type [ethereum | avalannche] (default ethereum)
+--network <value>     Network [goerli | mainnet] (default goerli, not required for avalanche)
+--multiSig <value>    Address of Multi-sig which will act as bridge admin
+--approve             Approve transaction hash
+--execute             Execute transaction
+--approvers <value>   Approvers addresses
 ```
 
 Using not setting `--approve` or `--execute` flag will get the transaction hash and data required by the multi-sig for approving or executing such action. [`example`](#example)
@@ -198,11 +200,11 @@ Removes an admin
 
 ### Example
 
-Let say the admin of BRIDGE is a MULTISIG with owners A, B and C and a threshold 2.
+Let say we are working in `Mainnet` `ethereum` side, the admin of BRIDGE is a MULTISIG with owners A, B and C and a threshold 2.
 
 `C` wants to propose updating the `fee` to a value of 10, so it gets the transaction hash and data for making the proposal
 ```bash
-cb-sol-cli --url RCP_URL --privateKey C_PK --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS
+cb-sol-cli --url RCP_URL --networkType ethereum --network mainnet --privateKey C_PK --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS
 ```
 Reult:
 ```
@@ -225,7 +227,7 @@ Since current multi-sig threshold is 2, at least 2 owners have to approve the tr
 
 Get hash and data:
 ```bash
-cb-sol-cli --url RCP_URL --privateKey A_PK --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS
+cb-sol-cli --url RCP_URL --networkType ethereum --network mainnet --privateKey A_PK --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS
 ```
 Checks result:
 ```
@@ -237,19 +239,19 @@ txData {
 
 Approves:
 ```bash
-cb-sol-cli --url RCP_URL --privateKey A_PK --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS --approve
+cb-sol-cli --url RCP_URL --networkType ethereum --network mainnet --privateKey A_PK --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS --approve
 ```
 
 `B` approves the transaction
 
 Approves:
 ```bash
-cb-sol-cli --url RCP_URL --privateKey B_PK --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS --approve
+cb-sol-cli --url RCP_URL --networkType ethereum --network mainnet --privateKey B_PK --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS --approve
 ```
 
 `C` executes the transaction
 
 Executes:
 ```bash
-cb-sol-cli --url RCP_URL --privateKey PK_B --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS  --execute --approvers A_ADDRESS,B_ADDRESS
+cb-sol-cli --url RCP_URL --networkType ethereum --network mainnet --privateKey PK_B --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS  --execute --approvers A_ADDRESS,B_ADDRESS
 ```

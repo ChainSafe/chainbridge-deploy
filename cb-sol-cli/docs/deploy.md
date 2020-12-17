@@ -14,7 +14,8 @@ Selection of contracts can be made by either specifying `--all` or a subset of t
   --weth                       Deploy wrapped ETH Erc20 contract
   --config                     Logs the configuration based on the deployment
   --multiSig                   Deploy multi-sig and set as bridge admin
-  --multiSigAddress <address>  Existing multi-sig address to be set as bridge admin
+  --networkType <value>        Network Type [ethereum | avalannche] (required for deploying multi-sig, default to ethereum)
+  --network <value>            Network [goerli | mainnet] (required for deploying multi-sig, default to goerli, not required for avalanche)
 ```
 
 If you are deploying the Bridge contract, you may want to specify these options as well:

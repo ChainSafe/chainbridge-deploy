@@ -75,6 +75,8 @@ Queries the contract address associated with the provided resource ID for a spec
 When the admin is a Gnosis Safe multi-sig contract all the commads should be executed using `--privateKey` of the multi-sig owner, adding the following parameters:
 
 ```
+--networkType <value> Network Type [ethereum | avalannche] (default ethereum)
+--network <value>     Network [goerli | mainnet] (default goerli, not required for avalanche)
 --multiSig <value> Address of Multi-sig which will act as bridge admin
 --approve Approve transaction hash
 --execute Execute transaction
@@ -108,8 +110,8 @@ Register a resource ID with a contract address for a generic handler.
   --handler <address>         Handler contract address
   --targetContract <address>  Contract address to be registered
   --resourceId <address>      ResourceID to be registered
-  --deposit <string>          Deposit function signature
-  --execute <string>          Execute proposal function signature
+  --depositSig <string>          Deposit function signature
+  --executeSig <string>          Execute proposal function signature
   --hash                      Treat signature inputs as function prototype strings, hash and take the first 4 bytes
 ```
 

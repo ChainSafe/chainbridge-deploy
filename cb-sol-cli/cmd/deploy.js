@@ -21,27 +21,21 @@ const deployCmd = new Command("deploy")
     .option('--centAsset', 'Deploy centrifuge asset contract')
     .option('--weth', 'Deploy wrapped ETH Erc20 contract')
     .option('--config', 'Logs the configuration based on the deployment', false)
-    .option('--multiSig', 'Deploy multi-sig and set as bridge admin')
-    .option('--multiSigAddress <address>', 'Existing multi-sig address to be set as bridge admin')
+    .option('--multiSig', 'Deploy multi-sig')
     .action(async (args) => {
         await setupParentArgs(args, args.parent)
         let startBal = await args.provider.getBalance(args.wallet.address)
         console.log("Deploying contracts...")
         if(args.all) {
-            if (args.multiSig) {
-                await deployMultiSig(args)
-            }
             await deployBridgeContract(args);
             await deployERC20Handler(args);
             await deployERC721Handler(args)
             await deployGenericHandler(args)
             await deployERC20(args)
             await deployERC721(args)
+            await deployMultiSig(args)
         } else {
             let deployed = false
-            if (args.multiSig) {
-                await deployMultiSig(args)
-            }
             if (args.bridge) {
                 await deployBridgeContract(args);
                 deployed = true
@@ -72,6 +66,10 @@ const deployCmd = new Command("deploy")
             }
             if (args.weth) {
                 await deployWETH(args)
+                deployed = true
+            }
+            if (args.multiSig) {
+                await deployMultiSig(args)
                 deployed = true
             }
 
@@ -170,13 +168,6 @@ async function deployBridgeContract(args) {
         { gasPrice: args.gasPrice, gasLimit: args.gasLimit}
 
     );
-    const bridgeInstance = await contract.deployed();
-
-    // If multi-sig was deployed or passed as parameter, set as THE admin
-    if (args.multiSigAddress) {
-        let tx = await bridgeInstance.renounceAdmin(args.multiSigAddress)
-        await waitForTx(args.provider, tx.hash)
-    }
 
     args.bridgeContract = contract.address
     console.log("✓ Bridge contract deployed")
