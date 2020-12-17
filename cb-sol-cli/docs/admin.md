@@ -111,7 +111,7 @@ When the admin is a Gnosis Safe multi-sig contract all the commads should be exe
 --approvers <value> Approvers addresses
 ```
 
-Using not setting `--approve` or `--execute` flag will get the transaction hash and data required by the multi-sig for approving or executing such action
+Using not setting `--approve` or `--execute` flag will get the transaction hash and data required by the multi-sig for approving or executing such action. [`example`](#example)
 
 - [`safe-add-relayer`](#safe-add-relayer)
 - [`safe-remove-relayer`](#safe-remove-relayer)
@@ -194,4 +194,62 @@ Removes an admin
 ```
 --admin <address>   Address of admin
 --bridge <address>  Bridge contract address
+```
+
+### Example
+
+Let say the admin of BRIDGE is a MULTISIG with owners A, B and C and a threshold 2.
+
+`C` wants to propose updating the `fee` to a value of 10, so it gets the transaction hash and data for making the proposal
+```bash
+cb-sol-cli --url RCP_URL --privateKey C_PK --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS
+```
+Reult:
+```
+transactionHash <THE HASH THAT NEEDS TO BE APPROVED>
+txData {
+  to: <'BRIDGE_ADDRESS'>,
+  value: '0',
+  data: <'SOME HEXA STRING'>,
+  operation: 0,
+  txGasEstimate: <SOME NUMBER>,
+  baseGasEstimate: <SOME NUMBER>,
+  transactionNonce: <BIGNUMBER REPRESENTING THE CURRENT MULTISIG NONCE WHICH WILL BE USES FOR EXECUTING THE TRANSACTION>
+}
+```
+
+
+Since current multi-sig threshold is 2, at least 2 owners have to approve the transaction hash
+
+`A` approves the transaction, but first it checks that it right
+
+Get hash and data:
+```bash
+cb-sol-cli --url RCP_URL --privateKey A_PK --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS
+```
+Checks result:
+```
+transactionHash <SAME HASH PROPOSED BY C>
+txData {
+  SAME DATA PROPOSED BY C
+}
+```
+
+Approves:
+```bash
+cb-sol-cli --url RCP_URL --privateKey A_PK --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS --approve
+```
+
+`B` approves the transaction
+
+Approves:
+```bash
+cb-sol-cli --url RCP_URL --privateKey B_PK --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS --approve
+```
+
+`C` executes the transaction
+
+Executes:
+```bash
+cb-sol-cli --url RCP_URL --privateKey PK_B --gasPrice SOME_GAS_PRICE  admin safe-set-fee --bridge BRIDGE_ADDRESS --fee 10 --multiSig MULTISIG_ADDRESS  --execute --approvers A_ADDRESS,B_ADDRESS
 ```

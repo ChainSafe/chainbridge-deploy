@@ -1,8 +1,7 @@
 const assert = require('assert')
 const ethers = require('ethers');
 const fs = require('fs');
-const getSafeToolchain = require('gnosis-safe-toolchain')
-const encodeFunctionData = require('gnosis-safe-toolchain/src/util/encode-function-data')
+const SafeToolchain = require('@protofire/gnosis-safe-toolchain')
 const constants = require('../constants');
 
 const setupParentArgs = async (args, parent) => {
@@ -38,7 +37,7 @@ const safeSetupParentArgs = async (args, parent) => {
         networkId = 5
     }
 
-    args.safeToolchain = getSafeToolchain({
+    args.safeToolchain = SafeToolchain({
         rpcUrl: args.url,
         walletPk: parent.privateKey,
         gasPrice: parent.gasPrice,
@@ -75,13 +74,13 @@ const log = (args, msg) => console.log(`[${args.parent._name}/${args._name}] ${m
 
 const safeTransactionAppoveExecute = async (args, functionName, params =[]) => {
     const { bridge, safeToolchain, multiSig, approve, provider, execute, approvers } = args
-    const encodedFuntionData = encodeFunctionData(constants.ContractABIs.Bridge.abi, bridge, safeToolchain.wallet, functionName, params)
+    const encodedFuntionData = SafeToolchain.util.encodeFunctionData(constants.ContractABIs.Bridge.abi, bridge, safeToolchain.wallet, functionName, params)
 
     const { transactionHash, txData} = await safeToolchain.commands.transactionData(multiSig, {
         to: bridge,
         value: '0',
         data: encodedFuntionData,
-        operation: 0 // CALL
+        operation: SafeToolchain.util.constants.CALL // CALL
     })
 
     console.log('transactionHash', transactionHash)
