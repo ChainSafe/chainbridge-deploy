@@ -16,8 +16,9 @@ NEW_ADMIN="0x55f511f91eE0D3368Bd6C2A7A8c1f4E685595b56"
 
 set -eux
 
-$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE deploy --all
+$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE deploy --all --erc20Symbol "TKN" --erc20Name "token  token"
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE deploy --centAsset
+$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE deploy --wetc
 
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 mint --amount 100
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 add-minter
@@ -52,3 +53,4 @@ $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE admin pause
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE admin unpause
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE admin set-fee --fee 1
 
+$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 wetc-deposit --amount 1
