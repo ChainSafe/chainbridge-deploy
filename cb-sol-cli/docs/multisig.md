@@ -33,7 +33,7 @@ Add a new multi-sig owner and change threshold
 ```
 
 ## safe-remove-owner
-Add an old multisig-owner and change threshold
+Remove an old multisig-owner and change threshold
 
 ```
 --owner <address>   Old owner address

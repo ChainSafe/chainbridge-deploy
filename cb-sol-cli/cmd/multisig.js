@@ -30,7 +30,7 @@ const addOwnerWithThresholdCmd = new Command('safe-add-owner')
     })
 
 const removeOwnerCmd = new Command('safe-remove-owner')
-    .description('Add an old multisig-owner and change threshold')
+    .description('Remove an old multisig-owner and change threshold')
     .requiredOption('--multiSig <value>', 'Address of Multi-sig')
     .option('--owner <address>', 'Old owner address')
     .option('--threshold <value>', 'New threshold')
