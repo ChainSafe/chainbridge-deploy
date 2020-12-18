@@ -2,7 +2,7 @@ const ethers = require('ethers');
 const constants = require('../constants');
 
 const {Command} = require('commander');
-const {setupParentArgs, getFunctionBytes, waitForTx, log} = require("./utils")
+const {setupParentArgs, getFunctionBytes, safeSetupParentArgs, safeTransactionAppoveExecute, splitCommaList, waitForTx, log, logSafe} = require("./utils")
 
 const EMPTY_SIG = "0x00000000"
 
@@ -19,6 +19,24 @@ const registerResourceCmd = new Command("register-resource")
         log(args,`Registering contract ${args.targetContract} with resource ID ${args.resourceId} on handler ${args.handler}`);
         const tx = await bridgeInstance.adminSetResource(args.handler, args.resourceId, args.targetContract, { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
         await waitForTx(args.provider, tx.hash)
+    })
+
+const safeRegisterResourceCmd = new Command("safe-register-resource")
+    .description("Register a resource ID with a contract address for a handler")
+    .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
+    .option('--handler <address>', 'Handler address', constants.ERC20_HANDLER_ADDRESS)
+    .option('--targetContract <address>', `Contract address to be registered`, constants.ERC20_ADDRESS)
+    .option('--resourceId <address>', `Resource ID to be registered`, constants.ERC20_RESOURCEID)
+    .requiredOption('--multiSig <value>', 'Address of Multi-sig which will acts bridge admin')
+    .option('--approve', 'Approve transaction hash')
+    .option('--execute', 'Execute transaction')
+    .option('--approvers <value>', 'Approvers addresses', splitCommaList)
+    .action(async function (args) {
+        await safeSetupParentArgs(args, args.parent.parent)
+
+        logSafe(args,`Registering contract ${args.targetContract} with resource ID ${args.resourceId} on handler ${args.handler}`);
+
+        await safeTransactionAppoveExecute(args, 'adminSetResource', [args.handler, args.resourceId, args.targetContract])
     })
 
 const registerGenericResourceCmd = new Command("register-generic-resource")
@@ -45,6 +63,32 @@ const registerGenericResourceCmd = new Command("register-generic-resource")
         await waitForTx(args.provider, tx.hash)
     })
 
+const safeRegisterGenericResourceCmd = new Command("safe-register-generic-resource")
+    .description("Register a resource ID with a generic handler")
+    .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
+    .option('--handler <address>', 'Handler contract address', constants.GENERIC_HANDLER_ADDRESS)
+    .option('--targetContract <address>', `Contract address to be registered`, constants.CENTRIFUGE_ASSET_STORE_ADDRESS)
+    .option('--resourceId <address>', `ResourceID to be registered`, constants.GENERIC_RESOURCEID)
+    .option('--depositSig <string>', "Deposit function signature", EMPTY_SIG)
+    .option('--executeSig <string>', "Execute proposal function signature", EMPTY_SIG)
+    .option('--hash', "Treat signature inputs as function prototype strings, hash and take the first 4 bytes", false)
+    .requiredOption('--multiSig <value>', 'Address of Multi-sig which will acts bridge admin')
+    .option('--approve', 'Approve transaction hash')
+    .option('--execute', 'Execute transaction')
+    .option('--approvers <value>', 'Approvers addresses', splitCommaList)
+    .action(async function(args) {
+        await safeSetupParentArgs(args, args.parent.parent)
+
+        if (args.hash) {
+            args.deposit = getFunctionBytes(args.deposit)
+            args.execute = getFunctionBytes(args.execute)
+        }
+
+        logSafe(args,`Registering generic resource ID ${args.resourceId} with contract ${args.targetContract} on handler ${args.handler}`)
+
+        await safeTransactionAppoveExecute(args, 'adminSetGenericResource', [args.handler, args.resourceId, args.targetContract, args.deposit, args.execute])
+    })
+
 const setBurnCmd = new Command("set-burn")
     .description("Set a token contract as burnable in a handler")
     .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
@@ -59,6 +103,23 @@ const setBurnCmd = new Command("set-burn")
         await waitForTx(args.provider, tx.hash)
     })
 
+const safeSetBurnCmd = new Command("sefe-set-burn")
+    .description("Set a token contract as burnable in a handler")
+    .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
+    .option('--handler <address>', 'ERC20 handler contract address', constants.ERC20_HANDLER_ADDRESS)
+    .option('--tokenContract <address>', `Token contract to be registered`, constants.ERC20_ADDRESS)
+    .requiredOption('--multiSig <value>', 'Address of Multi-sig which will acts bridge admin')
+    .option('--approve', 'Approve transaction hash')
+    .option('--execute', 'Execute transaction')
+    .option('--approvers <value>', 'Approvers addresses', splitCommaList)
+    .action(async function (args) {
+        await safeSetupParentArgs(args, args.parent.parent)
+
+        logSafe(args,`Setting contract ${args.tokenContract} as burnable on handler ${args.handler}`);
+
+        await safeTransactionAppoveExecute(args, 'adminSetBurnable', [args.handler, args.tokenContract])
+    })
+
 const cancelProposalCmd = new Command("cancel-proposal")
     .description("Cancel a proposal that has passed the expiry threshold")
     .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
@@ -71,6 +132,23 @@ const cancelProposalCmd = new Command("cancel-proposal")
         log(args, `Setting proposal with chain ID ${args.chainId} and deposit nonce ${args.depositNonce} status to 'Cancelled`);
         const tx = await bridgeInstance.adminCancelProposal(args.chainId, args.depositNonce);
         await waitForTx(args.provider, tx.hash)
+    })
+
+const safeCancelProposalCmd = new Command("safe-cancel-proposal")
+    .description("Cancel a proposal that has passed the expiry threshold")
+    .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
+    .option('--chainId <id>', 'Chain ID of proposal to cancel', 0)
+    .option('--depositNonce <value>', 'Deposit nonce of proposal to cancel', 0)
+    .requiredOption('--multiSig <value>', 'Address of Multi-sig which will acts bridge admin')
+    .option('--approve', 'Approve transaction hash')
+    .option('--execute', 'Execute transaction')
+    .option('--approvers <value>', 'Approvers addresses', splitCommaList)
+    .action(async function (args) {
+        await safeSetupParentArgs(args, args.parent.parent)
+
+        logSafe(args, `Setting proposal with chain ID ${args.chainId} and deposit nonce ${args.depositNonce} status to 'Cancelled`);
+
+        await safeTransactionAppoveExecute(args, 'adminCancelProposal', [args.chainId, args.depositNonce])
     })
 
 const queryProposalCmd = new Command("query-proposal")
@@ -104,10 +182,18 @@ const queryResourceId = new Command("query-resource")
 const bridgeCmd = new Command("bridge")
 
 bridgeCmd.addCommand(registerResourceCmd)
+bridgeCmd.addCommand(safeRegisterResourceCmd)
 bridgeCmd.addCommand(registerGenericResourceCmd)
+bridgeCmd.addCommand(safeRegisterGenericResourceCmd)
 bridgeCmd.addCommand(setBurnCmd)
+bridgeCmd.addCommand(safeSetBurnCmd)
 bridgeCmd.addCommand(cancelProposalCmd)
+bridgeCmd.addCommand(safeCancelProposalCmd)
 bridgeCmd.addCommand(queryProposalCmd)
 bridgeCmd.addCommand(queryResourceId)
+
+
+
+
 
 module.exports = bridgeCmd

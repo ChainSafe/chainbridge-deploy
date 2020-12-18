@@ -13,6 +13,9 @@ Selection of contracts can be made by either specifying `--all` or a subset of t
   --centAsset                  Deploy centrifuge asset contract
   --weth                       Deploy wrapped ETH Erc20 contract
   --config                     Logs the configuration based on the deployment
+  --multiSig                   Deploy multi-sig and set as bridge admin
+  --networkType <value>        Network Type [ethereum | avalannche] (required for deploying multi-sig, default to ethereum)
+  --network <value>            Network [goerli | mainnet] (required for deploying multi-sig, default to goerli, not required for avalanche)
 ```
 
 If you are deploying the Bridge contract, you may want to specify these options as well:
@@ -21,4 +24,10 @@ If you are deploying the Bridge contract, you may want to specify these options 
   --relayers <value>          List of initial relayers
   --relayerThreshold <value>  Number of votes required for a proposal to pass
   --fee <value>               Fee to be taken when making a deposit (in Ether)
+```
+
+If you are deploying the Multi-sig contract, you may want to specify these options as well:
+```
+  --multisigOwners <value>     List of initial multi-sig owners
+  --multisigThreshold <value>  Number of votes required for a multi-sig transaction to be executed
 ```

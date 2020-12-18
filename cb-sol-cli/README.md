@@ -2,20 +2,20 @@
 
 This CLI supports on-chain interactions with components of ChainBridge.
 
-## Installation 
+## Installation
 
 Installation requires the ABI files from the contracts which will be fetched and built from the chainbridge-solidity repo.
 ```
 $ make install
 ```
 
-## Usage 
+## Usage
 
 The root command (`cb-sol-cli`) has some options:
 ```
 --url <value>                 URL to connect to
---gasLimit <value>            Gas limit for transactions 
---gasPrice <value>            Gas price for transactions 
+--gasLimit <value>            Gas limit for transactions
+--gasPrice <value>            Gas price for transactions
 --networkId <value>	      Network id
 ```
 \
@@ -36,5 +36,4 @@ There are multiple subcommands provided:
 - [`admin`](docs/admin.md): Interactions with the bridge contract for administering relayer set, relayer threshold, fees and more.
 - [`erc20`](docs/erc20.md): Interactions with ERC20 contracts and handlers
 - [`erc721`](docs/erc721.md): Interactions with ERC721 contracts and handler
-
-
+- [`multisig`](docs/multisig.md): Interactions Multi-sig for administrating owners and threshold

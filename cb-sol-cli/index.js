@@ -11,6 +11,7 @@ const {
     erc20,
     erc721,
     centrifuge,
+    multisig
 } = require('./cmd/index');
 const constants = require('./constants');
 
@@ -22,6 +23,8 @@ program.option('--jsonWalletPassword <value>', '(Optional) Password for encrypte
 program.option('--gasLimit <value>', "Gas limit for transactions", "8000000")
 program.option('--gasPrice <value>', "Gas limit for transactions", "20000000")
 program.option('--networkId <value>', "Network Id")
+program.option('--networkType <value>', "Network Type", 'ethereum')
+program.option('--network <value>', "Network", 'goerli') //ethereum -> [goerli | mainnet]
 
 program.addCommand(deploy)
 program.addCommand(bridge)
@@ -29,6 +32,7 @@ program.addCommand(admin)
 program.addCommand(erc20)
 program.addCommand(erc721)
 program.addCommand(centrifuge)
+program.addCommand(multisig)
 
 program.allowUnknownOption(false);
 
