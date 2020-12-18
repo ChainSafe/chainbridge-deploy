@@ -63,6 +63,14 @@ Get the allowance of a spender for an address
   --erc20Address <address>  ERC20 contract address
 ```
 
+## `wetc-depost`
+Deposit ether into a WETC contract to mint tokens
+
+```
+  --amount <number>        Amount of ether to include in the deposit
+  --wetcAddress <address>  ERC20 contract address
+```
+
 ## `data-hash`
 Constructs proposal data and returns the hash required for on-chain queries.
 

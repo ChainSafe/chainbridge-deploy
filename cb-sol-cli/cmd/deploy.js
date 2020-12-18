@@ -17,9 +17,11 @@ const deployCmd = new Command("deploy")
     .option('--erc721Handler', 'Deploy erc721Handler contract')
     .option('--genericHandler', 'Deploy genericHandler contract')
     .option('--erc20', 'Deploy erc20 contract')
+    .option('--erc20Symbol <symbol>', 'Name for the erc20 contract', "")
+    .option('--erc20Name <name>', 'Symbol for the erc20 contract', "")
     .option('--erc721', 'Deploy erc721 contract')
     .option('--centAsset', 'Deploy centrifuge asset contract')
-    .option('--weth', 'Deploy wrapped ETH Erc20 contract')
+    .option('--wetc', 'Deploy wrapped ETC Erc20 contract')
     .option('--config', 'Logs the configuration based on the deployment', false)
     .option('--multiSig', 'Deploy multi-sig')
     .option('--multisigOwners <value>', 'List of initial multi-sig owners', splitCommaList, [])
@@ -66,8 +68,8 @@ const deployCmd = new Command("deploy")
                 await deployCentrifugeAssetStore(args);
                 deployed = true
             }
-            if (args.weth) {
-                await deployWETH(args)
+            if (args.wetc) {
+                await deployWETC(args)
                 deployed = true
             }
             if (args.multiSig) {
@@ -141,7 +143,7 @@ Erc721:             ${args.erc721Contract ? args.erc721Contract : "Not Deployed"
 ----------------------------------------------------------------
 Centrifuge Asset:   ${args.centrifugeAssetStoreContract ? args.centrifugeAssetStoreContract : "Not Deployed"}
 ----------------------------------------------------------------
-WETH:               ${args.WETHContract ? args.WETHContract : "Not Deployed"}
+WETC:               ${args.WETCContract ? args.WETCContract : "Not Deployed"}
 ================================================================
         `)
 }
@@ -170,7 +172,6 @@ async function deployBridgeContract(args) {
         ethers.utils.parseEther(args.fee.toString()),
         args.expiry,
         { gasPrice: args.gasPrice, gasLimit: args.gasLimit}
-
     );
 
     args.bridgeContract = contract.address
@@ -179,7 +180,7 @@ async function deployBridgeContract(args) {
 
 async function deployERC20(args) {
     const factory = new ethers.ContractFactory(constants.ContractABIs.Erc20Mintable.abi, constants.ContractABIs.Erc20Mintable.bytecode, args.wallet);
-    const contract = await factory.deploy("", "", { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
+    const contract = await factory.deploy(args.erc20Name, args.erc20Symbol, { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
     await contract.deployed();
     args.erc20Contract = contract.address
     console.log("✓ ERC20 contract deployed")
@@ -227,12 +228,12 @@ async function deployCentrifugeAssetStore(args) {
     console.log("✓ CentrifugeAssetStore contract deployed")
 }
 
-async function deployWETH(args) {
-    const factory = new ethers.ContractFactory(constants.ContractABIs.WETH.abi, constants.ContractABIs.WETH.bytecode, args.wallet);
+async function deployWETC(args) {
+    const factory = new ethers.ContractFactory(constants.ContractABIs.WETC.abi, constants.ContractABIs.WETC.bytecode, args.wallet);
     const contract = await factory.deploy({ gasPrice: args.gasPrice, gasLimit: args.gasLimit});
     await contract.deployed();
-    args.WETHContract = contract.address
-    console.log("✓ WETH contract deployed")
+    args.WETCContract = contract.address
+    console.log("✓ WETC contract deployed")
 }
 
 module.exports = deployCmd

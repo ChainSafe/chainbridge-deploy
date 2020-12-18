@@ -13,7 +13,7 @@ const ContractABIs = {
     Erc721Mintable: require(CONTRACT_PATH + "/ERC721MinterBurnerPauser.json"),
     GenericHandler: require(CONTRACT_PATH + "/GenericHandler.json"),
     CentrifugeAssetStore: require(CONTRACT_PATH + "/CentrifugeAsset.json"),
-    WETH: require("./contracts/WETH.json"),
+    WETC: require("./contracts/WETC.json"),
     HandlerHelpers: require(CONTRACT_PATH + "/HandlerHelpers.json")
 }
 
@@ -53,7 +53,7 @@ module.exports.GENERIC_HANDLER_ADDRESS = "0x2B6Ab4b880A45a07d83Cf4d664Df4Ab85705
 module.exports.ERC20_ADDRESS = "0x21605f71845f372A9ed84253d2D024B7B10999f4";
 module.exports.ERC721_ADDRESS = "0xd7E33e1bbf65dC001A0Eb1552613106CD7e40C31";
 module.exports.CENTRIFUGE_ASSET_STORE_ADDRESS = "0xc279648CE5cAa25B9bA753dAb0Dfef44A069BaF4";
-
+module.exports.WETC_ADDRESS = "0x84b141Aada70e2B0C3Ec25d24E81032328ea1b1A"
 module.exports.DEFAULT_SOURCE_ID = 0;
 module.exports.DEFAULT_DEST_ID = 1;
 

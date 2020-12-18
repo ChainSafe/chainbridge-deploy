@@ -108,6 +108,21 @@ const allowanceCmd = new Command("allowance")
         log(args, `Spender ${args.spender} is allowed to spend ${allowance} tokens on behalf of ${args.owner}`)
     })
 
+const wetcDepositCmd = new Command("wetc-deposit")
+    .description("Deposit ether into a wetc contract to mint tokens")
+    .option('--amount <number>', 'Amount of ether to include in the deposit')
+    .option('--wetcAddress <address>', 'ERC20 contract address', constants.WETC_ADDRESS)
+    .action(async function(args) {
+            await setupParentArgs(args, args.parent.parent)
+
+            const wetcInstance = new ethers.Contract(args.wetcAddress, constants.ContractABIs.WETC.abi, args.wallet);
+            let tx = await wetcInstance.deposit({value: ethers.utils.parseEther(args.amount), gasPrice: args.gasPrice, gasLimit: args.gasLimit})
+            await waitForTx(args.provider, tx.hash)
+            const newBalance = await wetcInstance.balanceOf(args.wallet.address)
+            const decimals = await wetcInstance.decimals();
+            log(args, `Deposited ${args.amount} into ${args.wetcAddress}. New Balance: ${ethers.utils.formatUnits(newBalance, decimals)}`)
+    })
+
 const createErc20ProposalData = (amount, recipient, decimals) => {
         if (recipient.substr(0, 2) === "0x") {
                 recipient = recipient.substr(2)
@@ -139,6 +154,7 @@ erc20Cmd.addCommand(approveCmd)
 erc20Cmd.addCommand(depositCmd)
 erc20Cmd.addCommand(balanceCmd)
 erc20Cmd.addCommand(allowanceCmd)
+erc20Cmd.addCommand(wetcDepositCmd)
 erc20Cmd.addCommand(proposalDataHashCmd)
 
 module.exports = erc20Cmd
