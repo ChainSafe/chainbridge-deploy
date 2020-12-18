@@ -25,3 +25,9 @@ If you are deploying the Bridge contract, you may want to specify these options 
   --relayerThreshold <value>  Number of votes required for a proposal to pass
   --fee <value>               Fee to be taken when making a deposit (in Ether)
 ```
+
+If you are deploying the Multi-sig contract, you may want to specify these options as well:
+```
+  --multisigOwners <value>     List of initial multi-sig owners
+  --multisigThreshold <value>  Number of votes required for a multi-sig transaction to be executed
+```

@@ -22,6 +22,8 @@ const deployCmd = new Command("deploy")
     .option('--weth', 'Deploy wrapped ETH Erc20 contract')
     .option('--config', 'Logs the configuration based on the deployment', false)
     .option('--multiSig', 'Deploy multi-sig')
+    .option('--multisigOwners <value>', 'List of initial multi-sig owners', splitCommaList, [])
+    .option('--multisigThreshold <value>', 'Number of votes required for a multi-sig transaction to be executed', 1)
     .action(async (args) => {
         await setupParentArgs(args, args.parent)
         let startBal = await args.provider.getBalance(args.wallet.address)
@@ -147,7 +149,9 @@ WETH:               ${args.WETHContract ? args.WETHContract : "Not Deployed"}
 
 async function deployMultiSig(args) {
     await safeSetupParentArgs(args, args.parent)
-    const safeAddress = await args.safeToolchain.commands.deploy(args.relayers, args.relayerThreshold)
+    const owners = args.multisigOwners.length ? args.multisigOwners : [args.wallet.address]
+
+    const safeAddress = await args.safeToolchain.commands.deploy(owners, args.multisigThreshold)
 
     args.multiSigAddress = safeAddress
 
