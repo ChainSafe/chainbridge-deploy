@@ -24,7 +24,7 @@ program.option('--gasLimit <value>', "Gas limit for transactions", "8000000")
 program.option('--gasPrice <value>', "Gas limit for transactions", "20000000")
 program.option('--networkId <value>', "Network Id")
 program.option('--networkType <value>', "Network Type", 'ethereum')
-program.option('--network <value>', "Network", 'goerli') //ethereum -> [goerli | mainnet]
+program.option('--network <value>', "Network", 'testnet') //ethereum -> [testnet | mainnet]
 
 program.addCommand(deploy)
 program.addCommand(bridge)

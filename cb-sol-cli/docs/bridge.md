@@ -76,11 +76,11 @@ When the admin is a Gnosis Safe multi-sig contract all the commads should be exe
 
 ```
 --networkType <value> Network Type [ethereum | avalannche] (default ethereum)
---network <value>     Network [goerli | mainnet] (default goerli, not required for avalanche)
---multiSig <value> Address of Multi-sig which will act as bridge admin
---approve Approve transaction hash
---execute Execute transaction
---approvers <value> Approvers addresses
+--network <value>     Network [testnet | mainnet] (default testnet)
+--multiSig <value>    Address of Multi-sig which will act as bridge admin
+--approve             Approve transaction hash
+--execute             Execute transaction
+--approvers <value>   Approvers addresses
 ```
 
 Using not setting `--approve` or `--execute` flag will get the transaction hash and data required by the multi-sig for approving or executing such action
