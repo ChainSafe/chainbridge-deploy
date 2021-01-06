@@ -15,7 +15,7 @@ Selection of contracts can be made by either specifying `--all` or a subset of t
   --config                     Logs the configuration based on the deployment
   --multiSig                   Deploy multi-sig and set as bridge admin
   --networkType <value>        Network Type [ethereum | avalannche] (required for deploying multi-sig, default to ethereum)
-  --network <value>            Network [goerli | mainnet] (required for deploying multi-sig, default to goerli, not required for avalanche)
+  --network <value>            Network [testnet | mainnet] (required for deploying multi-sig, default to testnet)
 ```
 
 If you are deploying the Bridge contract, you may want to specify these options as well:
