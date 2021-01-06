@@ -294,6 +294,36 @@ const safeWithdrawCmd = new Command("safe-withdraw")
         await safeTransactionAppoveExecute(args, 'adminWithdraw',[args.handler, args.tokenContract, args.recipient, args.amountOrId])
     })
 
+const transferFunds = new Command("transfer-funds")
+    .description("Transfers eth in the contract to the specified addresses")
+    .requiredOption('--bridge <address>', 'Bridge contract address')
+    .requiredOption('--addrs <value>', 'Array of addresses to transfer amounts to', splitCommaList)
+    .requiredOption('--amounts <value>', 'Array of amonuts to addrs')
+    .action(async function (args) {
+        await setupParentArgs(args, args.parent.parent)
+        const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
+        log(args, `Transfering to (${args.addrs}) the amounts ${args.amounts} of ETH in wei`)
+        let tx = await bridgeInstance.transferFunds(args.addrs, args.amounts)
+        await waitForTx(args.provider, tx.hash)
+    })
+
+const safeTransferFunds = new Command("safe-transfer-funds")
+    .description("Transfers eth in the contract to the specified addresses")
+    .requiredOption('--bridge <address>', 'Bridge contract address')
+    .requiredOption('--addrs <value>', 'Array of addresses to transfer amounts to', splitCommaList)
+    .requiredOption('--amounts <value>', 'Array of amonuts to addrs')
+    .requiredOption('--multiSig <value>', 'Address of Multi-sig which acts as bridge admin')
+    .option('--approve', 'Approve transaction hash')
+    .option('--execute', 'Execute transaction')
+    .option('--approvers <value>', 'Approvers addresses', splitCommaList)
+    .action(async function (args) {
+        await safeSetupParentArgs(args, args.parent.parent)
+
+        logSafe(args, `Transfering to (${args.addrs}) the amounts ${args.amounts} of ETH in wei`)
+
+        await safeTransactionAppoveExecute(args, 'transferFunds',[args.addrs, args.amounts])
+    })
+
 const adminCmd = new Command("admin")
 
 adminCmd.addCommand(isRelayerCmd)
@@ -317,5 +347,7 @@ adminCmd.addCommand(changeFeeCmd)
 adminCmd.addCommand(safeChangeFeeCmd)
 adminCmd.addCommand(withdrawCmd)
 adminCmd.addCommand(safeWithdrawCmd)
+adminCmd.addCommand(transferFunds)
+adminCmd.addCommand(safeTransferFunds)
 
 module.exports = adminCmd
