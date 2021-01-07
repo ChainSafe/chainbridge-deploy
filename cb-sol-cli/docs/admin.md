@@ -10,6 +10,7 @@
 - [`withdraw`](#withdraw)
 - [`add-admin`](#add-admin)
 - [`remove-admin`](#remove-admin)
+- [`transfer-funds`](#transfer-funds)
 
 ## `is-relayer`
 Check if an address is registered as a relayer.
@@ -100,6 +101,15 @@ Removes an admin
 --bridge <address>  Bridge contract address
 ```
 
+## `transfer-funds`
+Transfers eth in the contract to the specified addresses
+
+```
+--bridge <address> Bridge contract address
+--addrs <value>    Array of addresses to transfer amounts to
+--amounts <value>  Array of amonuts to addrs
+```
+
 # Admin Command using Multi-sig
 
 When the admin is a Gnosis Safe multi-sig contract all the commads should be executed using `--privateKey` of the multi-sig owner, adding the following parameters:
@@ -113,7 +123,7 @@ When the admin is a Gnosis Safe multi-sig contract all the commads should be exe
 --approvers <value>   Approvers addresses
 ```
 
-Using not setting `--approve` or `--execute` flag will get the transaction hash and data required by the multi-sig for approving or executing such action. [`example`](#example)
+Not setting `--approve` or `--execute` flag will get the transaction hash and data required by the multi-sig for approving or executing such action. [`example`](#example)
 
 - [`safe-add-relayer`](#safe-add-relayer)
 - [`safe-remove-relayer`](#safe-remove-relayer)
@@ -124,6 +134,7 @@ Using not setting `--approve` or `--execute` flag will get the transaction hash 
 - [`safe-withdraw`](#safe-withdraw)
 - [`safe-add-admin`](#safe-add-admin)
 - [`safe-remove-admin`](#safe-remove-admin)
+- [`safe-remove-admin`](#safe-transfer-funds)
 
 ## `safe-add-relayer`
 Adds a new relayer.
@@ -197,6 +208,16 @@ Removes an admin
 --admin <address>   Address of admin
 --bridge <address>  Bridge contract address
 ```
+
+## `safe-transfer-funds`
+Transfers eth in the contract to the specified addresses
+
+```
+--bridge <address> Bridge contract address
+--addrs <value>    Array of addresses to transfer amounts to
+--amounts <value>  Array of amonuts to addrs
+```
+
 
 ### Example
 

@@ -1,8 +1,7 @@
-const assert = require('assert')
 const ethers = require('ethers');
 const {Command} = require('commander');
 const constants = require('../constants');
-const {setupParentArgs, safeSetupParentArgs, splitCommaList, waitForTx} = require("./utils")
+const {setupParentArgs, safeSetupParentArgs, splitCommaList} = require("./utils")
 
 const deployCmd = new Command("deploy")
     .description("Deploys contracts via RPC")
