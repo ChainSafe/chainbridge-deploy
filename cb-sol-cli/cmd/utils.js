@@ -32,13 +32,13 @@ const safeSetupParentArgs = async (args, parent) => {
     assert(['ethereum', 'avalanche'].includes(parent.networkType), "Wrong networkType")
     assert(['testnet', 'mainnet'].includes(parent.network), "Wrong network")
 
-    let networkId = 1
+    let networkId = parent.networkType === 'ethereum' ? 1 : 'mainnet'
     if (parent.networkType === 'ethereum' && parent.network === 'testnet') {
         networkId = 5
     }
 
-    if (parent.networkType === 'avalanche' && parent.network === 'mainnet') {
-        assert(false, "C-CHAIN mainnet not implemented yet")
+    if (parent.networkType === 'avalanche' && parent.network === 'testnet') {
+        networkId = 'testnet'
     }
 
     args.safeToolchain = SafeToolchain({
