@@ -2,7 +2,8 @@ const Web3 = require("web3");
 const bridgeAbi = require("./abi.json");
 const abiDecoder = require("abi-decoder");
 
-const relayerConfig = require("./config").chains;
+const relayerConfig = require("./rado.json").chains;
+// const relayerConfig = require("./config").chains;
 
 class Trace {
   constructor(config, bridgeAbi) {
@@ -18,6 +19,7 @@ class Trace {
 
         chains[c.id] = {
           conn,
+          name: c.name,
           bridgeContract: new conn.eth.Contract(this.bridgeAbi, c.opts.bridge),
           ...c.opts
         };
@@ -30,66 +32,127 @@ class Trace {
     return chains;
   }
 
-  async trace(home, txhash) {
-    const homeChain = this.config[home];
+  async getChainConfigs() {
+    for (let key in this.config) {
+      let chain = this.config[key];
+      let chainId = await chain.bridgeContract.methods._chainID().call();
+      let expiry = await chain.bridgeContract.methods._expiry().call();
+      let fee = await chain.bridgeContract.methods._fee().call();
+      let threshold = await chain.bridgeContract.methods._relayerThreshold().call();
+      let paused = await chain.bridgeContract.methods.paused().call();
+      let totalRelayers = await chain.bridgeContract.methods._totalRelayers().call();
+
+      console.log(`
+      ${chain.name}
+      -------------
+      paused: ${paused}
+      chainId: ${chainId}
+      expiry: ${expiry}
+      fee: ${fee}
+      threshold: ${threshold}
+      totalRelayers: ${totalRelayers}
+      `);
+    }
+  }
+
+  async getAdmins() {
+    for (let key in this.config) {
+      let chain = this.config[key];
+      const adminRole = await chain.bridgeContract.methods.DEFAULT_ADMIN_ROLE().call();
+      
+      let admins = [];
+      let flag = true;
+      let index = 0;
+      while (flag) {
+        try {
+          const addr = await chain.bridgeContract.methods.getRoleMember(adminRole, index).call();
+          const code = await chain.conn.eth.getCode(addr);
+          const isContract = code === "0x" ? true : false;
+          admins.push(`${addr} (is contract: ${isContract})`);
+          index++;
+        } catch (e) {
+          // discard error, as we are probably out-of-bounds
+          // exit loop
+          flag = false;
+        }
+      }
+      console.log(`
+      ${chain.name} Admins
+      -------------
+      `)
+      admins.forEach(x => console.log("\t"+x))
+    }
+  }
+
+  async getRelayers() {
+    for (let key in this.config) {
+      let chain = this.config[key];
+      let total = await chain.bridgeContract.methods._totalRelayers().call();
+
+      let relayers = [];
+      let relayerRole = await chain.bridgeContract.methods.RELAYER_ROLE().call();
+      for (let i = 0; i < total; i++) {
+        relayers.push(await chain.bridgeContract.methods.getRoleMember(relayerRole, i).call());
+      }
+      console.log(`
+      ${chain.name} Relayers
+      -------------
+      `)
+      relayers.forEach(x => console.log("\t"+x))
+    }
+  }
+
+  async trace(homeId, txhash) {
+    const homeChain = this.config[homeId];
     const receipt = await homeChain.conn.eth.getTransactionReceipt(txhash);
     console.log("=======================")
-    const info = [];
-
+    let deposit; 
     /**
      * Decode home chain logs, and find deposit otherwise exit
-    */
+     */
     abiDecoder.addABI(bridgeAbi);
     const decodedLogs = abiDecoder.decodeLogs(receipt.logs)
     decodedLogs.forEach(log => {
       if (log && log.address == homeChain.bridgeContract._address) {
         if (log.name === "Deposit") {
+          console.log("Found deposit")
           log.events.forEach(x => {
             log[x.name] = x.value 
           })
           // deposit event found
-          info.push(log);
+          deposit = log;
         }
       }
     })
-    if (info.length === 0) {
+    if (!deposit) {
       console.log("No deposit event found!")
       process.exit(1);
     }
-
     /**
      * Decode destination chain logs
      */
-    const destChain = this.config[info[0].destinationChainID];
+    const destChain = this.config[deposit.destinationChainID];
     let startBlock = Number(destChain.startBlock);
+    console.log("attempting dest chain")
     const f = await destChain.bridgeContract.events.ProposalEvent({
       fromBlock: startBlock,
-    }, (e, f) => { console.log(e,f)})
-    // console.log(f)
+    }, (err, log) => {
+      if (err) console.log(error);
+      if (parseInt(homeId) == parseInt(log.returnValues.originChainID) &&
+        deposit.resourceID == log.returnValues.resourceID &&
+        parseInt(deposit.depositNonce.slice(2),0) == log.returnValues.depositNonce
+        ) {
+        console.log(log);      
+      }
+    })
   }
 }
 
-const poll = async (fn, time) => {
-  await fn();
-  setTimeout(() => poll(fn), time);
-};
-
 (async function() {
-  const t = new Trace(relayerConfig, bridgeAbi)
-  // const d = await t.getDeposit(1, 1, "0x0000000000000000000000ed52eca444088d3892edaebb05ccd012165545d305")
-  // console.log(d)
-  await t.trace(1, "0x3b22c1eb5400cc86fc3efc207b4a1395b9c190f40e8f45e0c9df89900ef9a1ec");
+  const t = new Trace(relayerConfig, bridgeAbi);
+  // await t.getChainConfigs();
+  // await t.getRelayers();
+  // await t.getAdmins();
+  // console.log("================NEW TRACE================")
+  await t.trace(process.argv[2], process.argv[3]);
 })()
-
-/**(async function() {
-  let web3 = new Web3(process.argv[2]);
-  let Bridge = new web3.eth.Contract(abi, process.argv[3]);
-  let total = await Bridge.methods._totalRelayers().call();
-
-  let relayers = [];
-  for (let i = 0; i < total; i++) {
-    relayers.push(await Bridge.methods.getRoleMember('0xe2b7fb3b832174769106daebcfd6d1970523240dda11281102db9363b83b0dc4', i).call());
-  }
-  console.log(relayers);
-})()
-*/
