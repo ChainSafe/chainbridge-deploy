@@ -1,0 +1,38 @@
+{
+    "chains": [
+            {
+                    "name": "goerli",
+                    "type": "ethereum",
+                    "id": "1",
+                    "endpoint": "wss://goerli.infura.io/ws/v3/9a76dde18da0480b96fe5fc0caf20bb0",
+                    "from": "0x3F92BC60265A30947728e368E25600f1FF0EA278",
+                    "opts": {
+                            "bridge": "0xe1FE92AFe025E72aAd3Abb77a7122E20521B7790",
+                            "erc20Handler": "0xEc8FCcd366D0C1257d40d801B1dDDF375B35d002",
+                            "erc721Handler": "0x2F586C298fbf33cB2b521653Ac3446f1bB1bE0D9",
+                            "genericHandler": "0x17A420bD537330efa535b68253A6e6d1fF10d14d",
+                            "gasLimit": "8000000",
+                            "maxGasPrice": "20000000",
+                            "startBlock": "4098695",
+                            "http": "false"
+                    }
+            },
+            {
+                    "name": "fuji",
+                    "type": "ethereum",
+                    "id": "2",
+                    "endpoint": "wss://avalanche--fuji--rpc.datahub.figment.io/apikey/f807d26722f6a1663721f4cf424f1066/ext/bc/C/ws",
+                    "from": "0x3F92BC60265A30947728e368E25600f1FF0EA278",
+                    "opts": {
+                            "bridge": "0xb91e995E53e12262Ba85b0390458D1dc29a7C71d",
+                            "erc20Handler": "0xb93885Af0b7071609c4d6bBdc130c2D243503Dc7",
+                            "erc721Handler": "0xe1FE92AFe025E72aAd3Abb77a7122E20521B7790",
+                            "genericHandler": "0xEc8FCcd366D0C1257d40d801B1dDDF375B35d002",
+                            "gasLimit": "8000000",
+                            "maxGasPrice": "500000000000",
+                            "startBlock": "0",
+                            "http": "false"
+                    }
+            }
+    ]
+}

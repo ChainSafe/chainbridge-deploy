@@ -1,0 +1,31 @@
+{"chains": [
+  {
+    "name": "goerli",
+    "type": "ethereum",
+    "id": "1",
+    "endpoint": "wss://goerli.infura.io/ws/v3/f6391e7e089040c8a899778383eb884c",
+    "from": "",
+    "opts": {
+      "bridge": "0x0993CEE13a42301d2e050693806fe79E822d42fB",
+      "erc20Handler": "0x68b6A17C5E4B08759ee7F2e092356c479C5Cc65d",
+      "erc721Handler": "0xed52eCA444088D3892EdaEbb05Ccd012165545D3",
+      "genericHandler": "0xd4B2c7B6CB241848Ac38EA94F131263A820c462D",
+      "startBlock": ""
+    }
+  },
+  {
+    "name": "AVAX-C",
+    "type": "ethereum",
+    "id": "2",
+    "endpoint": "wss://avalanche--fuji--rpc.datahub.figment.io/apikey/f807d26722f6a1663721f4cf424f1066/ext/bc/C/ws",
+    "from": "",
+    "opts": {
+      "bridge": "0xed52eCA444088D3892EdaEbb05Ccd012165545D3",
+      "erc20Handler": "0xd4B2c7B6CB241848Ac38EA94F131263A820c462D",
+      "erc721Handler": "0x6D16859DE8C9421E52c4F5A6003DAcA3B4f8e36B",
+      "genericHandler": "0x71181Ed7D6f42b594443a4Fd7F0Ce24B08787b77",
+      "startBlock": "2035"
+    }
+  }
+]
+}
