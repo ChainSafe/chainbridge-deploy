@@ -2,8 +2,8 @@ const Web3 = require("web3");
 const bridgeAbi = require("./abi.json");
 const abiDecoder = require("abi-decoder");
 
-const relayerConfig = require("./rado.json").chains;
-// const relayerConfig = require("./config").chains;
+//const relayerConfig = require("./rado-config.json").chains;
+const relayerConfig = require("./ava-config.json").chains;
 
 class Trace {
   constructor(config, bridgeAbi) {
