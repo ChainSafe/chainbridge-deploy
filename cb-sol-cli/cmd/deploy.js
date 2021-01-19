@@ -22,6 +22,7 @@ const deployCmd = new Command("deploy")
     .option('--centAsset', 'Deploy centrifuge asset contract')
     .option('--wetc', 'Deploy wrapped ETC Erc20 contract')
     .option('--config', 'Logs the configuration based on the deployment', false)
+    .option('--bridgeAddress', 'Address for currently deployed bridge", "")
     .action(async (args) => {
         await setupParentArgs(args, args.parent)
         let startBal = await args.provider.getBalance(args.wallet.address)
@@ -184,7 +185,8 @@ async function deployERC721(args) {
 
 async function deployERC721Handler(args) {
     const factory = new ethers.ContractFactory(constants.ContractABIs.Erc721Handler.abi, constants.ContractABIs.Erc721Handler.bytecode, args.wallet);
-    const contract = await factory.deploy(args.bridgeContract,[],[],[], { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
+    const bridgeAddr = args.bridgeContract || args.bridgeAddress;
+    const contract = await factory.deploy(bridgeAddr,[],[],[], { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
     await contract.deployed();
     args.erc721HandlerContract = contract.address
     console.log("✓ ERC721Handler contract deployed")
@@ -192,7 +194,8 @@ async function deployERC721Handler(args) {
 
 async function deployGenericHandler(args) {
     const factory = new ethers.ContractFactory(constants.ContractABIs.GenericHandler.abi, constants.ContractABIs.GenericHandler.bytecode, args.wallet)
-    const contract = await factory.deploy(args.bridgeContract, [], [], [], [], { gasPrice: args.gasPrice, gasLimit: args.gasLimit})
+    const bridgeAddr = args.bridgeContract || args.bridgeAddress;
+    const contract = await factory.deploy(bridgeAddr, [], [], [], [], { gasPrice: args.gasPrice, gasLimit: args.gasLimit})
     await contract.deployed();
     args.genericHandlerContract = contract.address
     console.log("✓ GenericHandler contract deployed")
