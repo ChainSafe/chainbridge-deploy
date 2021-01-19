@@ -22,7 +22,7 @@ const deployCmd = new Command("deploy")
     .option('--centAsset', 'Deploy centrifuge asset contract')
     .option('--wetc', 'Deploy wrapped ETC Erc20 contract')
     .option('--config', 'Logs the configuration based on the deployment', false)
-    .option('--bridgeAddress', "Address for currently deployed bridge")
+    .option('--bridgeAddress <address>', "Address for currently deployed bridge")
     .action(async (args) => {
         await setupParentArgs(args, args.parent)
         let startBal = await args.provider.getBalance(args.wallet.address)
