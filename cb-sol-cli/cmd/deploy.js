@@ -185,7 +185,7 @@ async function deployERC721(args) {
 
 async function deployERC721Handler(args) {
     const factory = new ethers.ContractFactory(constants.ContractABIs.Erc721Handler.abi, constants.ContractABIs.Erc721Handler.bytecode, args.wallet);
-    const bridgeAddr = args.bridgeContract || args.bridgeAddress;
+    const bridgeAddr = args.bridgeAddress;
     const contract = await factory.deploy(bridgeAddr,[],[],[], { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
     await contract.deployed();
     args.erc721HandlerContract = contract.address
@@ -194,7 +194,7 @@ async function deployERC721Handler(args) {
 
 async function deployGenericHandler(args) {
     const factory = new ethers.ContractFactory(constants.ContractABIs.GenericHandler.abi, constants.ContractABIs.GenericHandler.bytecode, args.wallet)
-    const bridgeAddr = args.bridgeContract || args.bridgeAddress;
+    const bridgeAddr = args.bridgeAddress;
     const contract = await factory.deploy(bridgeAddr, [], [], [], [], { gasPrice: args.gasPrice, gasLimit: args.gasLimit})
     await contract.deployed();
     args.genericHandlerContract = contract.address
