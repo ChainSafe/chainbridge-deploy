@@ -31,6 +31,7 @@ jobs:
         run: make install
       - name: Run Tests
         run: |
+          make install
           cd chainbridge-solidity
           SILENT=true make start-ganache
           ../../ci/ci_cli.sh
@@ -88,6 +89,10 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
+      - name: Install cb-sol-cli
+        run: |
+          cd ../cb-sol-cli/
+          make install
       - name: Run Tests
         run: |
           ./docker/run_ci.sh
