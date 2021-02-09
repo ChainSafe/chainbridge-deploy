@@ -3,7 +3,7 @@ module github.com/ChainSafe/chainbridge-deploy/deploy-test
 go 1.13
 
 require (
-	github.com/ChainSafe/ChainBridge v1.0.0
+	github.com/ChainSafe/ChainBridge v1.1.0
 	github.com/ChainSafe/log15 v1.0.0
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/aristanetworks/goarista v0.0.0-20200609010056-95bcf8053598 // indirect
