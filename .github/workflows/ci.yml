@@ -28,7 +28,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install ganache & cli
-        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           make install
           npm i -g ganache-cli
@@ -95,6 +94,9 @@ jobs:
         run: |
           cd ../cb-sol-cli/
           sudo make install
+      - name: Run Linter
+        run: |
+          make lint
       - name: Run Tests
         run: |
           ./docker/run_ci.sh
