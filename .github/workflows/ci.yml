@@ -27,11 +27,13 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install dependencies
-        run: make install
-      - name: Run Tests
+      - name: Install ganache & cli
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           make install
+          npm i -g ganache-cli
+      - name: Run Tests
+        run: |
           cd chainbridge-solidity
           SILENT=true make start-ganache
           ../../ci/ci_cli.sh
@@ -92,7 +94,7 @@ jobs:
       - name: Install cb-sol-cli
         run: |
           cd ../cb-sol-cli/
-          make install
+          sudo make install
       - name: Run Tests
         run: |
           ./docker/run_ci.sh
