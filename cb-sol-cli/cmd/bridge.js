@@ -136,9 +136,9 @@ const cc = new Command("cc")
           }}
         ));
         const bridgeInstance = new web3.eth.Contract(constants.ContractABIs.Bridge.abi, args.bridge);
-        bridgeInstance.events.ProposalEvent({fromBlock: 11688193, to: "latest"}, (err, tx) => {
-            if (err) console.log(err)
-            console.log("Checking tx from block: ", tx.blockNumber)
+        const txs = await bridgeInstance.getPastEvents('ProposalEvent', {fromBlock: 11688193, toBlock: "latest"});
+        txs.map(tx => {
+            console.log("Checking tx from block: ", tx.blockNumber);
             const {depositNonce, status} = tx.returnValues;
             if(status == "3") {
                 
