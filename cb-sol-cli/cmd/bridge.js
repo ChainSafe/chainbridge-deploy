@@ -136,19 +136,22 @@ const cc = new Command("cc")
           }}
         ));
         const bridgeInstance = new web3.eth.Contract(constants.ContractABIs.Bridge.abi, args.bridge);
-        const txs = await bridgeInstance.getPastEvents('ProposalEvent', {fromBlock: 11688193, toBlock: "latest"});
-        txs.map(tx => {
-            console.log("Checking tx from block: ", tx.blockNumber);
-            const {depositNonce, status} = tx.returnValues;
-            if(status == "3") {
-                
-                if(!Array.isArray(arr[depositNonce])) { arr[depositNonce] = [] } 
-                arr[depositNonce].push(tx.transactionHash)
-                if (arr[depositNonce].length > 1) {
-                    console.log("Duplicate: ", arr[depositNonce])
-                }
-            }  
-        })
+        
+        for (let i = 20000; i < 200000; i = i+10000) {
+            console.log("Start Block", i, "End Block", i + 10000)
+            const txs = await bridgeInstance.getPastEvents('ProposalEvent', {fromBlock: i, toBlock: i + 10000});
+            txs.map(tx => {
+                const {depositNonce, status} = tx.returnValues;
+                if(status == "3") {
+                    
+                    if(!Array.isArray(arr[depositNonce])) { arr[depositNonce] = [] } 
+                    arr[depositNonce].push(tx.transactionHash)
+                    if (arr[depositNonce].length > 1) {
+                        console.log("Duplicate: ", arr[depositNonce])
+                    }
+                }  
+            })
+        }
     })
 
 const bridgeCmd = new Command("bridge")
