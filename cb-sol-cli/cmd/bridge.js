@@ -130,7 +130,11 @@ const cc = new Command("cc")
     .action(async function(args) {
         await setupParentArgs(args, args.parent.parent)
         let arr = {};
-        const web3 = new Web3(args.url);
+        const web3 = new Web3(new Web3.providers.WebsocketProvider(args.url, {clientConfig: {
+            maxReceivedFrameSize: 100000000,
+            maxReceivedMessageSize: 100000000,
+          }}
+        ));
         const bridgeInstance = new web3.eth.Contract(constants.ContractABIs.Bridge.abi, args.bridge);
         bridgeInstance.events.ProposalEvent({fromBlock: 11688193, to: "latest"}, (err, tx) => {
             if (err) console.log(err)
