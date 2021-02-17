@@ -141,7 +141,8 @@ const cc = new Command("cc")
             console.log("Checking tx from block: ", tx.blockNumber)
             const {depositNonce, status} = tx.returnValues;
             if(status == "3") {
-                arr[depositNonce] = [];
+                
+                if(!Array.isArray(arr[depositNonce])) { arr[depositNonce] = [] } 
                 arr[depositNonce].push(tx.transactionHash)
                 if (arr[depositNonce].length > 1) {
                     console.log("Duplicate: ", arr[depositNonce])
