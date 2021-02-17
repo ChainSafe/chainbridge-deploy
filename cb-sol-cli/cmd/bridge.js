@@ -1,4 +1,5 @@
 const ethers = require('ethers');
+const Web3 = require("web3");
 const constants = require('../constants');
 
 const {Command} = require('commander');
@@ -86,6 +87,7 @@ const queryProposalCmd = new Command("query-proposal")
         const prop = await bridgeInstance.getProposal(args.chainId, args.depositNonce, args.dataHash)
 
         console.log(prop)
+        console.log(prop._proposedBlock.toNumber())
     })
 
 const queryResourceId = new Command("query-resource")
@@ -100,6 +102,49 @@ const queryResourceId = new Command("query-resource")
         log(args, `Resource ID ${args.resourceId} is mapped to contract ${address}`)
     })
 
+const custom = new Command("custom")
+    .description("Query the contract address associated with a resource ID")
+    .option('--bridge <address>', 'Handler contract address', constants.ERC20_HANDLER_ADDRESS)
+    .option('--handler <address>', `ResourceID to query`, constants.ERC20_RESOURCEID)
+    .action(async function(args) {
+        await setupParentArgs(args, args.parent.parent)
+        // const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
+
+        const handlerInstance = new ethers.Contract(args.handler, constants.ContractABIs.Erc20Handler.abi, args.wallet);
+        let record = await handlerInstance.getDepositRecord(1143, 2)
+        console.log("5", record._amount.toString())
+        record = await handlerInstance.getDepositRecord(1144, 2)
+        console.log("6",record._amount.toString())
+        record = await handlerInstance.getDepositRecord(1145, 2)
+        console.log("7", record._amount.toString())
+        record = await handlerInstance.getDepositRecord(1147, 2)
+        console.log("6",record._amount.toString())
+        record = await handlerInstance.getDepositRecord(1148, 2)
+        console.log("7", record._amount.toString())
+    })
+
+const cc = new Command("cc")
+    .description("Query the contract address associated with a resource ID")
+    .option('--bridge <address>', 'Handler contract address', constants.ERC20_HANDLER_ADDRESS)
+    .option('--handler <address>', `ResourceID to query`, constants.ERC20_RESOURCEID)
+    .action(async function(args) {
+        await setupParentArgs(args, args.parent.parent)
+        let arr = {};
+        const web3 = new Web3(args.url);
+        const bridgeInstance = new web3.eth.Contract(constants.ContractABIs.Bridge.abi, args.bridge);
+        bridgeInstance.events.ProposalEvent({fromBlock: 11688193, to: "latest"}, (err, tx) => {
+            if (err) console.log(err)
+            console.log("Checking tx from block: ", tx.blockNumber)
+            const {depositNonce, status} = tx.returnValues;
+            if(status == "3") {
+                arr[depositNonce] = [];
+                arr[depositNonce].push(tx.transactionHash)
+                if (arr[depositNonce].length > 1) {
+                    console.log("Duplicate: ", arr[depositNonce])
+                }
+            }  
+        })
+    })
 
 const bridgeCmd = new Command("bridge")
 
@@ -109,5 +154,7 @@ bridgeCmd.addCommand(setBurnCmd)
 bridgeCmd.addCommand(cancelProposalCmd)
 bridgeCmd.addCommand(queryProposalCmd)
 bridgeCmd.addCommand(queryResourceId)
+bridgeCmd.addCommand(custom)
+bridgeCmd.addCommand(cc)
 
 module.exports = bridgeCmd
