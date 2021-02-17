@@ -3,7 +3,7 @@ const bridgeAbi = require("./abi.json");
 const abiDecoder = require("abi-decoder");
 
 //const relayerConfig = require("./rado-config.json").chains;
-const relayerConfig = require("./ava-config.json").chains;
+const relayerConfig = require("./ava-new.json").chains;
 
 class Trace {
   constructor(config, bridgeAbi) {
@@ -16,7 +16,6 @@ class Trace {
     config.forEach(c => {
       if (c.type == "ethereum") {
         const conn = new Web3(c.endpoint);
-
         chains[c.id] = {
           conn,
           name: c.name,
@@ -137,7 +136,7 @@ class Trace {
     const f = await destChain.bridgeContract.events.ProposalEvent({
       fromBlock: startBlock,
     }, (err, log) => {
-      if (err) console.log(error);
+      if (err) console.log(err);
       if (parseInt(homeId) == parseInt(log.returnValues.originChainID) &&
         deposit.resourceID == log.returnValues.resourceID &&
         parseInt(deposit.depositNonce.slice(2),0) == log.returnValues.depositNonce
