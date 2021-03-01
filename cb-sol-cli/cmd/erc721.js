@@ -103,7 +103,7 @@ const createErc721ProposalData = (id, recipient, metadata) => {
     }
     console.log(metadata)
     return '0x' +
-        ethers.utils.hexZeroPad(ethers.utils.bigNumberify(id).toHexString(), 32).substr(2) +
+        ethers.utils.hexZeroPad(ethers.BigNumber.from(id).toHexString(), 32).substr(2) +
         ethers.utils.hexZeroPad(ethers.utils.hexlify(recipient.length / 2 + recipient.length % 2), 32).substr(2) +
         recipient +
         ethers.utils.hexZeroPad(ethers.utils.hexlify(metadata.length / 2 + metadata.length % 2), 32).substr(2) +
