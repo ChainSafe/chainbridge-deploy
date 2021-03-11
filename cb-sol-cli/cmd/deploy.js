@@ -104,8 +104,8 @@ const displayLog = (args) => {
 ================================================================
 Url:        ${args.url}
 Deployer:   ${args.wallet.address}
-Gas Limit:   ${ethers.utils.bigNumberify(args.gasLimit)}
-Gas Price:   ${ethers.utils.bigNumberify(args.gasPrice)}
+Gas Limit:   ${ethers.BigNumber.from(args.gasLimit)}
+Gas Price:   ${ethers.BigNumber.from(args.gasPrice)}
 Deploy Cost: ${ethers.utils.formatEther(args.cost)}
 
 Options
