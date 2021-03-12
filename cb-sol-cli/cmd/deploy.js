@@ -1,3 +1,4 @@
+const { BigNumber } = require('ethers');
 const ethers = require('ethers');
 const {Command} = require('commander');
 const constants = require('../constants');
@@ -104,8 +105,8 @@ const displayLog = (args) => {
 ================================================================
 Url:        ${args.url}
 Deployer:   ${args.wallet.address}
-Gas Limit:   ${ethers.BigNumber.from(args.gasLimit)}
-Gas Price:   ${ethers.BigNumber.from(args.gasPrice)}
+Gas Limit:   ${BigNumber.from(args.gasLimit)}
+Gas Price:   ${BigNumber.from(args.gasPrice)}
 Deploy Cost: ${ethers.utils.formatEther(args.cost)}
 
 Options

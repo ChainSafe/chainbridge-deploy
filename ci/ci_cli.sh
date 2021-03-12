@@ -32,13 +32,13 @@ $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 balance
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc20 data-hash --amount 100
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE bridge query-proposal
 
-$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc721 mint --id 0x1
+$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc721 mint --id 0x01
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc721 add-minter
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE bridge register-resource --handler $ERC721_HANDLER --resourceId $ERC721_RESOURCE_ID --targetContract $ERC721_CONTRACT
-$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc721 approve --id 0x1
+$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc721 approve --id 0x01
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE bridge set-burn --handler $ERC721_HANDLER --tokenContract $ERC721_CONTRACT
-$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc721 deposit --id 0x1
-$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc721 data-hash --id 0x1 --metadata "0x1234"
+$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc721 deposit --id 0x01
+$CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE erc721 data-hash --id 0x01 --metadata "0x1234"
 
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE bridge register-generic-resource --execute "store(bytes32)" --hash
 $CMD --gasLimit $GAS_LIMIT --gasPrice $GAS_PRICE cent getHash
