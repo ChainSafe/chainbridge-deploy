@@ -21,6 +21,6 @@
   },
   "dependencies": {
     "commander": "^5.0.0",
-    "ethers": "^4.0.46"
+    "ethers": "^5.1.3"
   }
 }
