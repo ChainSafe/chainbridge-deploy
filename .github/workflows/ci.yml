@@ -1,0 +1,104 @@
+name: ci
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test-cli:
+    name: cb-sol-cli Tests
+    defaults:
+      run:
+        working-directory: cb-sol-cli
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install ganache & cli
+        run: |
+          make install
+          npm i -g ganache-cli
+      - name: Run Tests
+        run: |
+          cd chainbridge-solidity
+          SILENT=true make start-ganache
+          ../../ci/ci_cli.sh
+
+  test-cfgBuild:
+    name: cfgBuilder Tests
+    defaults:
+      run:
+        working-directory: cfgBuilder
+    strategy:
+      matrix:
+        go-version: [ 1.15.x ]
+        platform: [ ubuntu-latest ]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Run Linter
+        run: |
+          make lint
+      - name: Run Tests
+        run: |
+          go test ./...
+
+  test-deploy-test:
+    name: deploy-test Tests
+    defaults:
+      run:
+        working-directory: deploy-test
+    strategy:
+      matrix:
+        go-version: [ 1.15.x ]
+        platform: [ ubuntu-latest ]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install cb-sol-cli
+        run: |
+          cd ../cb-sol-cli/
+          sudo make install
+      - name: Run Linter
+        run: |
+          make lint
+      - name: Run Tests
+        run: |
+          ./docker/run_ci.sh
+          docker ps
+          make test
