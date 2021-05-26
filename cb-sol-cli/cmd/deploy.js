@@ -1,7 +1,7 @@
 const ethers = require('ethers');
 const {Command} = require('commander');
 const constants = require('../constants');
-const {setupParentArgs, splitCommaList, isValidBridgeAddress, isValidAddress} = require("./utils")
+const {setupParentArgs, splitCommaList, isValidAddress} = require("./utils")
 
 const deployCmd = new Command("deploy")
     .description("Deploys contracts via RPC")
