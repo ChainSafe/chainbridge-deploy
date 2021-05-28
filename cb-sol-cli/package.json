@@ -20,6 +20,7 @@
     "cb-sol-cli": "./index.js"
   },
   "dependencies": {
+    "@protofire/gnosis-safe-toolchain": "github:protofire/gnosis-safe-toolchain",
     "commander": "^5.0.0",
     "ethers": "^4.0.46"
   }

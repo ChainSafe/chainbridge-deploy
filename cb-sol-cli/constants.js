@@ -62,3 +62,7 @@ module.exports.ERC721_RESOURCEID = ethers.utils.hexZeroPad((this.ERC721_ADDRESS 
 module.exports.GENERIC_RESOURCEID = ethers.utils.hexZeroPad((this.CENTRIFUGE_ASSET_STORE_ADDRESS + ethers.utils.hexlify(this.DEFAULT_SOURCE_ID).substr(2)), 32);
 
 module.exports.ERC20_PROPOSAL_HASH = "0x19b14d095647bb784f237072e14df1133fbd2008c5039c469321d77099a7b6da"
+
+module.exports.GETTING_MULTISIG_TRANSACTION = 'Getting Multi-sig transaction for: '
+module.exports.APPROVING_MULTISIG_TRANSACTION = 'Approving Multi-sig transaction for: '
+module.exports.EXECUTING_MULTISIG_TRANSACTION = 'Executing Multi-sig transaction for: '
