@@ -192,7 +192,7 @@ async function deployERC721Handler(args) {
 
 async function deployGenericHandler(args) {
     const factory = new ethers.ContractFactory(constants.ContractABIs.GenericHandler.abi, constants.ContractABIs.GenericHandler.bytecode, args.wallet)
-    const contract = await factory.deploy(args.bridgeContract, [], [], [], [], { gasPrice: args.gasPrice, gasLimit: args.gasLimit})
+    const contract = await factory.deploy(args.bridgeContract, [], [], [], [], [], { gasPrice: args.gasPrice, gasLimit: args.gasLimit})
     await contract.deployed();
     args.genericHandlerContract = contract.address
     console.log("✓ GenericHandler contract deployed")
