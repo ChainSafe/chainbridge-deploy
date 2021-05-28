@@ -45,6 +45,16 @@ const expandDecimals = (amount, decimals = 18) => {
     return ethers.utils.parseUnits(String(amount), decimals);
 }
 
+const isValidAddress = (address) => {
+    try {
+        ethers.utils.getAddress(address);
+    } catch (e) { 
+        console.log(`${address} is not a valid address: ` + e)
+        return false; 
+    }
+    return true;
+}
+
 const log = (args, msg) => console.log(`[${args.parent._name}/${args._name}] ${msg}`)
 
 module.exports = {
@@ -53,5 +63,6 @@ module.exports = {
     getFunctionBytes,
     waitForTx,
     log,
-    expandDecimals
+    expandDecimals,
+    isValidAddress
 }

@@ -1,7 +1,7 @@
 const ethers = require('ethers');
 const {Command} = require('commander');
 const constants = require('../constants');
-const {setupParentArgs, splitCommaList} = require("./utils")
+const {setupParentArgs, splitCommaList, isValidAddress} = require("./utils")
 
 const deployCmd = new Command("deploy")
     .description("Deploys contracts via RPC")
@@ -15,6 +15,7 @@ const deployCmd = new Command("deploy")
     .option('--erc20Handler', 'Deploy erc20Handler contract')
     .option('--erc721Handler', 'Deploy erc721Handler contract')
     .option('--genericHandler', 'Deploy genericHandler contract')
+    .option('--bridgeAddress <address>', 'Bridge contract address for independent handler deployment', "")
     .option('--erc20', 'Deploy erc20 contract')
     .option('--erc20Symbol <symbol>', 'Name for the erc20 contract', "")
     .option('--erc20Name <name>', 'Symbol for the erc20 contract', "")
@@ -85,7 +86,7 @@ const createConfig = (args) => {
     config.name = "eth";
     config.chainId = args.chainId;
     config.endpoint = args.url;
-    config.bridge = args.bridgeContract;
+    config.bridge = args.bridgeAddress;
     config.erc20Handler = args.erc20HandlerContract;
     config.erc721Handler = args.erc721HandlerContract;
     config.genericHandler = args.genericHandlerContract;
@@ -118,7 +119,7 @@ Expiry:      ${args.expiry}
 
 Contract Addresses
 ================================================================
-Bridge:             ${args.bridgeContract ? args.bridgeContract : "Not Deployed"}
+Bridge:             ${args.bridgeAddress ? args.bridgeAddress : "Not Deployed"}
 ----------------------------------------------------------------
 Erc20 Handler:      ${args.erc20HandlerContract ? args.erc20HandlerContract : "Not Deployed"}
 ----------------------------------------------------------------
@@ -152,7 +153,7 @@ async function deployBridgeContract(args) {
         { gasPrice: args.gasPrice, gasLimit: args.gasLimit}
     );
     await contract.deployed();
-    args.bridgeContract = contract.address
+    args.bridgeAddress = contract.address
     console.log("✓ Bridge contract deployed")
 }
 
@@ -165,10 +166,12 @@ async function deployERC20(args) {
 }
 
 async function deployERC20Handler(args) {
+    if (!isValidAddress(args.bridgeAddress)) {
+        console.log("ERC20Handler contract failed to deploy due to invalid bridge address")
+        return 
+    }
     const factory = new ethers.ContractFactory(constants.ContractABIs.Erc20Handler.abi, constants.ContractABIs.Erc20Handler.bytecode, args.wallet);
-
-
-    const contract = await factory.deploy(args.bridgeContract, [], [], [], { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
+    const contract = await factory.deploy(args.bridgeAddress, [], [], [], { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
     await contract.deployed();
     args.erc20HandlerContract = contract.address
     console.log("✓ ERC20Handler contract deployed")
@@ -183,16 +186,24 @@ async function deployERC721(args) {
 }
 
 async function deployERC721Handler(args) {
+    if (!isValidAddress(args.bridgeAddress)) {
+        console.log("ERC721Handler contract failed to deploy due to invalid bridge address")
+        return 
+    }
     const factory = new ethers.ContractFactory(constants.ContractABIs.Erc721Handler.abi, constants.ContractABIs.Erc721Handler.bytecode, args.wallet);
-    const contract = await factory.deploy(args.bridgeContract,[],[],[], { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
+    const contract = await factory.deploy(args.bridgeAddress,[],[],[], { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
     await contract.deployed();
     args.erc721HandlerContract = contract.address
     console.log("✓ ERC721Handler contract deployed")
 }
 
 async function deployGenericHandler(args) {
+    if (!isValidAddress(args.bridgeAddress)) {
+        console.log("GenericHandler contract failed to deploy due to invalid bridge address")
+        return 
+    }
     const factory = new ethers.ContractFactory(constants.ContractABIs.GenericHandler.abi, constants.ContractABIs.GenericHandler.bytecode, args.wallet)
-    const contract = await factory.deploy(args.bridgeContract, [], [], [], [], { gasPrice: args.gasPrice, gasLimit: args.gasLimit})
+    const contract = await factory.deploy(args.bridgeAddress, [], [], [], [], { gasPrice: args.gasPrice, gasLimit: args.gasLimit})
     await contract.deployed();
     args.genericHandlerContract = contract.address
     console.log("✓ GenericHandler contract deployed")
