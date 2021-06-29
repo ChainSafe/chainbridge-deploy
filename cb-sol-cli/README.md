@@ -8,6 +8,10 @@ Installation requires the ABI files from the contracts which will be fetched and
 ```
 $ make install
 ```
+### Installation for optimism chain
+```
+$ make install-optimism
+```
 
 ## Usage 
 

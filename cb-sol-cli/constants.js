@@ -17,7 +17,19 @@ const ContractABIs = {
     HandlerHelpers: require(CONTRACT_PATH + "/HandlerHelpers.json")
 }
 
+const CONTRACT_PATH_OPTIMISM = "./optimism/chainbridge-solidity/artifacts-ovm/contracts"
+const ContractABIsOptimism = {
+    Bridge: require(CONTRACT_PATH_OPTIMISM + "/Bridge.sol/Bridge.json"),
+    Erc20Handler: require(CONTRACT_PATH_OPTIMISM + "/handlers/ERC20Handler.sol/ERC20Handler.json"),
+    Erc20Mintable: require(CONTRACT_PATH_OPTIMISM + "/ERC20PresetMinterPauser.sol/ERC20PresetMinterPauser.json"),
+    Erc721Handler: require(CONTRACT_PATH_OPTIMISM + "/handlers/ERC721Handler.sol/ERC721Handler.json"),
+    Erc721Mintable: require(CONTRACT_PATH_OPTIMISM + "/ERC721MinterBurnerPauser.sol/ERC721MinterBurnerPauser.json"),
+    GenericHandler: require(CONTRACT_PATH_OPTIMISM + "/handlers/GenericHandler.sol/GenericHandler.json"),
+    HandlerHelpers: require(CONTRACT_PATH_OPTIMISM + "/handlers/HandlerHelpers.sol/HandlerHelpers.json")
+}
+
 module.exports.ContractABIs = ContractABIs
+module.exports.ContractABIsOptimism = ContractABIsOptimism
 module.exports.ADMIN_ROLE = "0x0000000000000000000000000000000000000000000000000000000000000000"
 // This is just Alice's key.
 module.exports.deployerAddress = "0xff93B45308FD417dF303D6515aB04D9e89a750Ca";
@@ -62,3 +74,6 @@ module.exports.ERC721_RESOURCEID = ethers.utils.hexZeroPad((this.ERC721_ADDRESS 
 module.exports.GENERIC_RESOURCEID = ethers.utils.hexZeroPad((this.CENTRIFUGE_ASSET_STORE_ADDRESS + ethers.utils.hexlify(this.DEFAULT_SOURCE_ID).substr(2)), 32);
 
 module.exports.ERC20_PROPOSAL_HASH = "0x19b14d095647bb784f237072e14df1133fbd2008c5039c469321d77099a7b6da"
+
+module.exports.OPTIMISM_GAS_PRICE = 0;
+module.exports.OPTIMISM_GAS_LIMIT = 8800999;
