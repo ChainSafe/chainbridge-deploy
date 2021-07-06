@@ -12,12 +12,15 @@ const registerResourceCmd = new Command("register-resource")
     .option('--handler <address>', 'Handler address', constants.ERC20_HANDLER_ADDRESS)
     .option('--targetContract <address>', `Contract address to be registered`, constants.ERC20_ADDRESS)
     .option('--resourceId <address>', `Resource ID to be registered`, constants.ERC20_RESOURCEID)
+    .option('--optimism', 'Optimism chain', false)
     .action(async function (args) {
         await setupParentArgs(args, args.parent.parent)
 
-        const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
+        const bridgeInstance = new ethers.Contract(args.bridge, args.optimism ? constants.ContractABIsOptimism.Bridge.abi : constants.ContractABIs.Bridge.abi, args.wallet);
+        const gasPrice = args.optimism ? constants.OPTIMISM_GAS_PRICE : args.gasPrice;
+        const gasLimit = args.optimism ? constants.OPTIMISM_GAS_LIMIT : args.gasLimit;
         log(args,`Registering contract ${args.targetContract} with resource ID ${args.resourceId} on handler ${args.handler}`);
-        const tx = await bridgeInstance.adminSetResource(args.handler, args.resourceId, args.targetContract, { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
+        const tx = await bridgeInstance.adminSetResource(args.handler, args.resourceId, args.targetContract, { gasPrice, gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -30,10 +33,13 @@ const registerGenericResourceCmd = new Command("register-generic-resource")
     .option('--deposit <string>', "Deposit function signature", EMPTY_SIG)
     .option('--execute <string>', "Execute proposal function signature", EMPTY_SIG)
     .option('--hash', "Treat signature inputs as function prototype strings, hash and take the first 4 bytes", false)
+    .option('--optimism', 'Optimism chain', false)
     .action(async function(args) {
         await setupParentArgs(args, args.parent.parent)
 
-        const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
+        const bridgeInstance = new ethers.Contract(args.bridge, args.optimism ? constants.ContractABIsOptimism.Bridge.abi : constants.ContractABIs.Bridge.abi, args.wallet);
+        const gasPrice = args.optimism ? constants.OPTIMISM_GAS_PRICE : args.gasPrice;
+        const gasLimit = args.optimism ? constants.OPTIMISM_GAS_LIMIT : args.gasLimit;
 
         if (args.hash) {
             args.deposit = getFunctionBytes(args.deposit)
@@ -41,7 +47,7 @@ const registerGenericResourceCmd = new Command("register-generic-resource")
         }
 
         log(args,`Registering generic resource ID ${args.resourceId} with contract ${args.targetContract} on handler ${args.handler}`)
-        const tx = await bridgeInstance.adminSetGenericResource(args.handler, args.resourceId, args.targetContract, args.deposit, args.execute, { gasPrice: args.gasPrice, gasLimit: args.gasLimit})
+        const tx = await bridgeInstance.adminSetGenericResource(args.handler, args.resourceId, args.targetContract, args.deposit, args.execute, { gasPrice, gasLimit })
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -50,12 +56,15 @@ const setBurnCmd = new Command("set-burn")
     .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
     .option('--handler <address>', 'ERC20 handler contract address', constants.ERC20_HANDLER_ADDRESS)
     .option('--tokenContract <address>', `Token contract to be registered`, constants.ERC20_ADDRESS)
+    .option('--optimism', 'Optimism chain', false)
     .action(async function (args) {
         await setupParentArgs(args, args.parent.parent)
-        const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
+        const bridgeInstance = new ethers.Contract(args.bridge, args.optimism ? constants.ContractABIsOptimism.Bridge.abi : constants.ContractABIs.Bridge.abi, args.wallet);
+        const gasPrice = args.optimism ? constants.OPTIMISM_GAS_PRICE : args.gasPrice;
+        const gasLimit = args.optimism ? constants.OPTIMISM_GAS_LIMIT : args.gasLimit;
 
         log(args,`Setting contract ${args.tokenContract} as burnable on handler ${args.handler}`);
-        const tx = await bridgeInstance.adminSetBurnable(args.handler, args.tokenContract, { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
+        const tx = await bridgeInstance.adminSetBurnable(args.handler, args.tokenContract, { gasPrice, gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -63,10 +72,11 @@ const queryIsBurnCmd = new Command("query-is-burn")
     .description("Get whether the token address is registered as mintable/burnable in a handler")
     .option('--handler <address>', 'Handler contract address', constants.ERC20_HANDLER_ADDRESS)
     .option('--tokenContract <address>', 'Token contract being queried if it is burnable', constants.ERC20_ADDRESS)
+    .option('--optimism', 'Optimism chain', false)
     .action(async function (args) {
         await setupParentArgs(args, args.parent.parent)
 
-        const handlerInstance = new ethers.Contract(args.handler, constants.ContractABIs.HandlerHelpers.abi, args.wallet)
+        const handlerInstance = new ethers.Contract(args.handler, args.optimism ? constants.ContractABIsOptimism.HandlerHelpers.abi : constants.ContractABIs.HandlerHelpers.abi, args.wallet)
         const isBurn = await handlerInstance._burnList(args.tokenContract)
         log(args, `Getting if contract ${args.tokenContract} is registered as burnable on handler ${args.handler}: ${isBurn}`)
     })
@@ -76,12 +86,15 @@ const cancelProposalCmd = new Command("cancel-proposal")
     .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
     .option('--chainId <id>', 'Chain ID of proposal to cancel', 0)
     .option('--depositNonce <value>', 'Deposit nonce of proposal to cancel', 0)
+    .option('--optimism', 'Optimism chain', false)
     .action(async function (args) {
         await setupParentArgs(args, args.parent.parent)
-        const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
+        const bridgeInstance = new ethers.Contract(args.bridge, args.optimism ? constants.ContractABIsOptimism.Bridge.abi : constants.ContractABIs.Bridge.abi, args.wallet);
+        const gasPrice = args.optimism ? constants.OPTIMISM_GAS_PRICE : args.gasPrice;
+        const gasLimit = args.optimism ? constants.OPTIMISM_GAS_LIMIT : args.gasLimit;
 
         log(args, `Setting proposal with chain ID ${args.chainId} and deposit nonce ${args.depositNonce} status to 'Cancelled`);
-        const tx = await bridgeInstance.adminCancelProposal(args.chainId, args.depositNonce);
+        const tx = await bridgeInstance.adminCancelProposal(args.chainId, args.depositNonce, { gasPrice, gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -91,9 +104,10 @@ const queryProposalCmd = new Command("query-proposal")
     .option('--chainId <id>', 'Source chain ID of proposal', 0)
     .option('--depositNonce <value>', 'Deposit nonce of proposal', 0)
     .option('--dataHash <value>', 'Hash of proposal metadata', constants.ERC20_PROPOSAL_HASH)
+    .option('--optimism', 'Optimism chain', false)
     .action(async function (args) {
         await setupParentArgs(args, args.parent.parent)
-        const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
+        const bridgeInstance = new ethers.Contract(args.bridge, args.optimism ? constants.ContractABIsOptimism.Bridge.abi : constants.ContractABIs.Bridge.abi, args.wallet);
 
         const prop = await bridgeInstance.getProposal(args.chainId, args.depositNonce, args.dataHash)
 
@@ -104,14 +118,14 @@ const queryResourceId = new Command("query-resource")
     .description("Query the contract address associated with a resource ID")
     .option('--handler <address>', 'Handler contract address', constants.ERC20_HANDLER_ADDRESS)
     .option('--resourceId <address>', `ResourceID to query`, constants.ERC20_RESOURCEID)
+    .option('--optimism', 'Optimism chain', false)
     .action(async function(args) {
         await setupParentArgs(args, args.parent.parent)
 
-        const handlerInstance = new ethers.Contract(args.handler, constants.ContractABIs.HandlerHelpers.abi, args.wallet)
+        const handlerInstance = new ethers.Contract(args.handler, args.optimism ? constants.ContractABIsOptimism.HandlerHelpers.abi : constants.ContractABIs.HandlerHelpers.abi, args.wallet)
         const address = await handlerInstance._resourceIDToTokenContractAddress(args.resourceId)
         log(args, `Resource ID ${args.resourceId} is mapped to contract ${address}`)
     })
-
 
 const bridgeCmd = new Command("bridge")
 
