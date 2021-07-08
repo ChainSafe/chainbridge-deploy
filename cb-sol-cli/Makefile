@@ -6,7 +6,8 @@ SOL_OPTIMISM_BRANCH=viatrix/optimism
 
 fetch-contracts:
 	@echo " > \033[32mFetching chainbridge-solidity contracts... \033[0m "
-	git clone ${SOL_URL} && cd chainbridge-solidity && git checkout ${SOL_VERSION}
+	# git clone ${SOL_URL} && cd chainbridge-solidity && git checkout ${SOL_VERSION}
+	git clone ${SOL_URL} && cd chainbridge-solidity
 
 fetch-contracts-optimism:
 	@echo " > \033[32mFetching chainbridge-solidity optimism contracts... \033[0m "
