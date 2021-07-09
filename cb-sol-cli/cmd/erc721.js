@@ -9,16 +9,12 @@ const mintCmd = new Command("mint")
     .option('--erc721Address <address>', 'ERC721 contract address', constants.ERC721_ADDRESS)
     .option('--id <id>', "Token id", "0x1")
     .option('--metadata <bytes>', "Metadata (tokenURI) for token", "")
-    .option('--optimism', 'Optimism chain', false)
     .action(async function (args) {
         await setupParentArgs(args, args.parent.parent)
         const erc721Instance = new ethers.Contract(args.erc721Address, constants.ContractABIs.Erc721Mintable.abi, args.wallet);
 
-        const gasPrice = args.optimism ? constants.OPTIMISM_GAS_PRICE : args.gasPrice;
-        const gasLimit = args.optimism ? constants.OPTIMISM_GAS_LIMIT : args.gasLimit;
-
         log(args, `Minting token with id ${args.id} to ${args.wallet.address} on contract ${args.erc721Address}!`);
-        const tx = await erc721Instance.mint(args.wallet.address, ethers.utils.hexlify(args.id), args.metadata, { gasPrice, gasLimit });
+        const tx = await erc721Instance.mint(args.wallet.address, ethers.utils.hexlify(args.id), args.metadata, { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -37,15 +33,12 @@ const addMinterCmd = new Command("add-minter")
     .description("Add a new minter to the contract")
     .option('--erc721Address <address>', 'ERC721 contract address', constants.ERC721_ADDRESS)
     .option('--minter <address>', 'Minter address', constants.relayerAddresses[1])
-    .option('--optimism', 'Optimism chain', false)
     .action(async function (args) {
         await setupParentArgs(args, args.parent.parent)
         const erc721Instance = new ethers.Contract(args.erc721Address, constants.ContractABIs.Erc721Mintable.abi, args.wallet);
         const MINTER_ROLE = await erc721Instance.MINTER_ROLE()
-        const gasPrice = args.optimism ? constants.OPTIMISM_GAS_PRICE : args.gasPrice;
-        const gasLimit = args.optimism ? constants.OPTIMISM_GAS_LIMIT : args.gasLimit;
         log(args, `Adding ${args.minter} as a minter of ${args.erc721Address}`)
-        const tx = await erc721Instance.grantRole(MINTER_ROLE, args.minter, { gasPrice, gasLimit });
+        const tx = await erc721Instance.grantRole(MINTER_ROLE, args.minter, { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -54,15 +47,12 @@ const approveCmd = new Command("approve")
     .option('--id <id>', "Token ID to transfer", "0x1")
     .option('--recipient <address>', 'Destination recipient address', constants.ERC721_HANDLER_ADDRESS)
     .option('--erc721Address <address>', 'ERC721 contract address', constants.ERC721_ADDRESS)
-    .option('--optimism', 'Optimism chain', false)
     .action(async function (args) {
         await setupParentArgs(args, args.parent.parent)
         const erc721Instance = new ethers.Contract(args.erc721Address, constants.ContractABIs.Erc721Mintable.abi, args.wallet);
-        const gasPrice = args.optimism ? constants.OPTIMISM_GAS_PRICE : args.gasPrice;
-        const gasLimit = args.optimism ? constants.OPTIMISM_GAS_LIMIT : args.gasLimit;
 
         log(args, `Approving ${args.recipient} to spend token ${args.id} from ${args.wallet.address} on contract ${args.erc721Address}!`);
-        const tx = await erc721Instance.approve(args.recipient, ethers.utils.hexlify(args.id), { gasPrice, gasLimit });
+        const tx = await erc721Instance.approve(args.recipient, ethers.utils.hexlify(args.id), { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -73,12 +63,11 @@ const depositCmd = new Command("deposit")
     .option(`--recipient <address>`, 'Destination recipient address', constants.relayerAddresses[4])
     .option('--resourceId <resourceID>', 'Resource ID for transfer', constants.ERC721_RESOURCEID)
     .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
-    .option('--optimism', 'Optimism chain', false)
     .action(async function (args) {
         await setupParentArgs(args, args.parent.parent)
 
         // Instances
-        const bridgeInstance = new ethers.Contract(args.bridge, args.optimism ? constants.ContractABIsOptimism.Bridge.abi : constants.ContractABIs.Bridge.abi, args.wallet);
+        const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
 
         const data = '0x' +
             ethers.utils.hexZeroPad(ethers.utils.hexlify(args.id), 32).substr(2) +  // Deposit Amount        (32 bytes)
@@ -94,13 +83,11 @@ const depositCmd = new Command("deposit")
         log(args, "Creating deposit to initiate transfer!")
 
         // Perform deposit
-        const gasPrice = args.optimism ? constants.OPTIMISM_GAS_PRICE : args.gasPrice;
-        const gasLimit = args.optimism ? constants.OPTIMISM_GAS_LIMIT : args.gasLimit;
         const tx = await bridgeInstance.deposit(
             args.dest, // destination chain id
             args.resourceId,
             data,
-            {gasPrice, gasLimit});
+            { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 

@@ -19,7 +19,7 @@ program.option('--url <value>', 'URL to connect to', "http://localhost:8545");
 program.option('--privateKey <value>', 'Private key to use', constants.deployerPrivKey);
 program.option('--jsonWallet <path>', '(Optional) Encrypted JSON wallet');
 program.option('--jsonWalletPassword <value>', '(Optional) Password for encrypted JSON wallet');
-program.option('--gasLimit <value>', "Gas limit for transactions", "8000000")
+program.option('--gasLimit <value>', "Gas limit for transactions", constants.GAS_LIMIT);
 program.option('--gasPrice <value>', "Gas limit for transactions", "20000000")
 program.option('--networkId <value>', "Network Id")
 

@@ -75,5 +75,4 @@ module.exports.GENERIC_RESOURCEID = ethers.utils.hexZeroPad((this.CENTRIFUGE_ASS
 
 module.exports.ERC20_PROPOSAL_HASH = "0x19b14d095647bb784f237072e14df1133fbd2008c5039c469321d77099a7b6da"
 
-module.exports.OPTIMISM_GAS_PRICE = 0;
-module.exports.OPTIMISM_GAS_LIMIT = 8800999;
+module.exports.GAS_LIMIT = 8000000;
