@@ -24,7 +24,11 @@ const addAdminCmd = new Command("add-admin")
     await setupParentArgs(args, args.parent.parent)
     const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
     log(args, `Adding ${args.admin} as a admin.`)
-    let tx = await bridgeInstance.grantRole(constants.ADMIN_ROLE, args.admin)
+    let gasLimit = args.gasLimit;
+    if (args.optimism) {
+        gasLimit = await bridgeInstance.estimate.grantRole(constants.ADMIN_ROLE, args.admin);
+    }
+    let tx = await bridgeInstance.grantRole(constants.ADMIN_ROLE, args.admin, { gasPrice: args.gasPrice, gasLimit })
     await waitForTx(args.provider, tx.hash)
   })
 
@@ -36,7 +40,11 @@ const removeAdminCmd = new Command("remove-admin")
     await setupParentArgs(args, args.parent.parent)
     const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
     log(args, `Removing ${args.admin} as a admin.`)
-    let tx = await bridgeInstance.revokeRole(constants.ADMIN_ROLE, args.admin)
+    let gasLimit = args.gasLimit;
+    if (args.optimism) {
+        gasLimit = await bridgeInstance.estimate.revokeRole(constants.ADMIN_ROLE, args.admin)
+    }
+    let tx = await bridgeInstance.revokeRole(constants.ADMIN_ROLE, args.admin, { gasPrice: args.gasPrice, gasLimit })
     await waitForTx(args.provider, tx.hash)
   })
 
@@ -48,7 +56,11 @@ const addRelayerCmd = new Command("add-relayer")
         await setupParentArgs(args, args.parent.parent)
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
         log(args, `Adding ${args.relayer} as a relayer.`)
-        let tx = await bridgeInstance.adminAddRelayer(args.relayer)
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await bridgeInstance.estimate.adminAddRelayer(args.relayer);
+        }
+        let tx = await bridgeInstance.adminAddRelayer(args.relayer, { gasPrice: args.gasPrice, gasLimit })
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -60,7 +72,11 @@ const removeRelayerCmd = new Command("remove-relayer")
         await setupParentArgs(args, args.parent.parent)
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
         log(args, `Removing relayer ${args.relayer}.`)
-        let tx = await bridgeInstance.adminRemoveRelayer(args.relayer)
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await bridgeInstance.estimate.adminRemoveRelayer(args.relayer);
+        }
+        let tx = await bridgeInstance.adminRemoveRelayer(args.relayer, { gasPrice: args.gasPrice, gasLimit })
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -72,7 +88,11 @@ const setThresholdCmd = new Command("set-threshold")
         await setupParentArgs(args, args.parent.parent)
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
         log(args, `Setting relayer threshold to ${args.threshold}`)
-        let tx = await bridgeInstance.adminChangeRelayerThreshold(args.threshold)
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await bridgeInstance.estimate.adminChangeRelayerThreshold(args.threshold);
+        }
+        let tx = await bridgeInstance.adminChangeRelayerThreshold(args.threshold, { gasPrice: args.gasPrice, gasLimit })
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -83,7 +103,11 @@ const pauseTransfersCmd = new Command("pause")
         await setupParentArgs(args, args.parent.parent)
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
         log(args, `Pausing deposits and proposals`)
-        let tx = await bridgeInstance.adminPauseTransfers()
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await bridgeInstance.estimate.adminPauseTransfers();
+        }
+        let tx = await bridgeInstance.adminPauseTransfers({ gasPrice: args.gasPrice, gasLimit })
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -94,7 +118,11 @@ const unpauseTransfersCmd = new Command("unpause")
         await setupParentArgs(args, args.parent.parent)
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
         log(args, `Unpausing deposits and proposals`)
-        let tx = await bridgeInstance.adminUnpauseTransfers()
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await bridgeInstance.estimate.adminUnpauseTransfers()
+        }
+        let tx = await bridgeInstance.adminUnpauseTransfers({ gasPrice: args.gasPrice, gasLimit })
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -106,7 +134,11 @@ const changeFeeCmd = new Command("set-fee")
         await setupParentArgs(args, args.parent.parent)
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
         log(args, `Setting fee to ${args.fee} wei`)
-        let tx = await bridgeInstance.adminChangeFee(args.fee)
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await bridgeInstance.estimate.adminChangeFee(args.fee)
+        }
+        let tx = await bridgeInstance.adminChangeFee(args.fee, { gasPrice: args.gasPrice, gasLimit })
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -121,7 +153,11 @@ const withdrawCmd = new Command("withdraw")
         await setupParentArgs(args, args.parent.parent)
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
         log(args, `Withdrawing tokens (${args.amountOrId}) in contract ${args.tokenContract} to recipient ${args.recipient}`)
-        let tx = await bridgeInstance.adminWithdraw(args.handler, args.tokenContract, args.recipient, args.amountOrId)
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await bridgeInstance.estimate.adminWithdraw(args.handler, args.tokenContract, args.recipient, args.amountOrId)
+        }
+        let tx = await bridgeInstance.adminWithdraw(args.handler, args.tokenContract, args.recipient, args.amountOrId, { gasPrice: args.gasPrice, gasLimit })
         await waitForTx(args.provider, tx.hash)
     })
 

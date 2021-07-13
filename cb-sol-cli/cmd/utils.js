@@ -20,6 +20,7 @@ const setupParentArgs = async (args, parent) => {
         const keyfile = JSON.parse(raw);
         args.wallet = await ethers.Wallet.fromEncryptedJson(keyfile, parent.jsonWalletPassword)
     }
+    args.optimism= parent.optimism
 }
 
 const splitCommaList = (str) => {

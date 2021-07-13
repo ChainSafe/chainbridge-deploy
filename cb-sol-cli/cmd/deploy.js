@@ -24,7 +24,6 @@ const deployCmd = new Command("deploy")
     .option('--centAsset', 'Deploy centrifuge asset contract')
     .option('--wetc', 'Deploy wrapped ETC Erc20 contract')
     .option('--config', 'Logs the configuration based on the deployment', false)
-    .option('--optimism', 'Deploys the contracts on optimism chain', false)
     .action(async (args) => {
         await setupParentArgs(args, args.parent)
         let startBal = await args.provider.getBalance(args.wallet.address)
@@ -249,26 +248,41 @@ async function deployBridgeContractOptimism(args) {
     let factory = new ethers.ContractFactory(constants.ContractABIsOptimism.Bridge.abi, constants.ContractABIsOptimism.Bridge.bytecode, args.wallet);
 
     // Deploy
+    const deployTx = factory.getDeployTransaction();
+    let gasLimit = await args.provider.estimateGas(deployTx);
+    console.log('Bridge deploy gas limit: ', gasLimit.toString());
+
     let contract = await factory.deploy(
-        { gasPrice: args.gasPrice, gasLimit: args.gasLimit }
+        { gasPrice: args.gasPrice, gasLimit }
     );
     await contract.deployed();
     args.bridgeAddress = contract.address;
+    gasLimit = await contract.estimate.init(
+        args.chainId,
+        args.relayers,
+        args.relayerThreshold,
+        ethers.utils.parseEther(args.fee.toString()),
+        args.expiry
+    );
+    console.log('Bridge init gas limit: ', gasLimit.toString());
     await contract.init(
         args.chainId,
         args.relayers,
         args.relayerThreshold,
         ethers.utils.parseEther(args.fee.toString()),
         args.expiry,
-        { gasPrice: args.gasPrice, gasLimit: args.gasLimit }
+        { gasPrice: args.gasPrice, gasLimit }
     );
     console.log("✓ Bridge contract deployed");
 }
 
 async function deployERC20Optimism(args) {
     const factory = new ethers.ContractFactory(constants.ContractABIsOptimism.Erc20Mintable.abi, constants.ContractABIsOptimism.Erc20Mintable.bytecode, args.wallet);
+    const deployTx = factory.getDeployTransaction(args.erc20Name, args.erc20Symbol);
+    const gasLimit = await args.provider.estimateGas(deployTx);
+    console.log('ERC20 deploy gas limit: ', gasLimit.toString());
     const contract = await factory.deploy(args.erc20Name, args.erc20Symbol, 
-        { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+        { gasPrice: args.gasPrice, gasLimit });
     await contract.deployed();
     args.erc20Contract = contract.address;
     console.log("✓ ERC20 contract deployed");
@@ -280,17 +294,25 @@ async function deployERC20HandlerOptimism(args) {
         return 
     }
     const factory = new ethers.ContractFactory(constants.ContractABIsOptimism.Erc20Handler.abi, constants.ContractABIsOptimism.Erc20Handler.bytecode, args.wallet);
-    const contract = await factory.deploy({ gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+    const deployTx = factory.getDeployTransaction();
+    let gasLimit = await args.provider.estimateGas(deployTx);
+    console.log('ERC20Handler deploy gas limit: ', gasLimit.toString());
+    const contract = await factory.deploy({ gasPrice: args.gasPrice, gasLimit });
     await contract.deployed();
     args.erc20HandlerContract = contract.address;
+    gasLimit = await contract.estimate.init(args.bridgeAddress, [], [], []);
+    console.log('ERC20Handler init gas limit: ', gasLimit.toString());
     await contract.init(args.bridgeAddress, [], [], [],
-        { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+        { gasPrice: args.gasPrice, gasLimit });
     console.log("✓ ERC20Handler contract deployed")
 }
 
 async function deployERC721Optimism(args) {
     const factory = new ethers.ContractFactory(constants.ContractABIsOptimism.Erc721Mintable.abi, constants.ContractABIsOptimism.Erc721Mintable.bytecode, args.wallet);
-    const contract = await factory.deploy("", "", "", { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+    const deployTx = factory.getDeployTransaction("", "", "",);
+    const gasLimit = await args.provider.estimateGas(deployTx);
+    console.log('ERC721 deploy gas limit: ', gasLimit.toString());
+    const contract = await factory.deploy("", "", "", { gasPrice: args.gasPrice, gasLimit });
     await contract.deployed();
     args.erc721Contract = contract.address;
     console.log("✓ ERC721 contract deployed");
@@ -302,10 +324,15 @@ async function deployERC721HandlerOptimism(args) {
         return 
     }
     const factory = new ethers.ContractFactory(constants.ContractABIsOptimism.Erc721Handler.abi, constants.ContractABIsOptimism.Erc721Handler.bytecode, args.wallet);
-    const contract = await factory.deploy({ gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+    const deployTx = factory.getDeployTransaction();
+    let gasLimit = await args.provider.estimateGas(deployTx);
+    console.log('ERC721Handler deploy gas limit: ', gasLimit.toString());
+    const contract = await factory.deploy({ gasPrice: args.gasPrice, gasLimit });
     await contract.deployed();
     args.erc721HandlerContract = contract.address;
-    await contract.init(args.bridgeAddress,[],[],[], { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+    gasLimit = await contract.estimate.init(args.bridgeAddress,[],[],[]);
+    console.log('ERC721Handler init gas limit: ', gasLimit.toString());
+    await contract.init(args.bridgeAddress,[],[],[], { gasPrice: args.gasPrice, gasLimit });
     console.log("✓ ERC721Handler contract deployed");
 }
 
@@ -315,10 +342,15 @@ async function deployGenericHandlerOptimism(args) {
         return 
     }
     const factory = new ethers.ContractFactory(constants.ContractABIsOptimism.GenericHandler.abi, constants.ContractABIsOptimism.GenericHandler.bytecode, args.wallet)
-    const contract = await factory.deploy({ gasPrice: args.gasPrice, gasLimit: args.gasLimit })
+    const deployTx = factory.getDeployTransaction();
+    let gasLimit = await args.provider.estimateGas(deployTx);
+    console.log('GenericHandler deploy gas limit: ', gasLimit.toString());
+    const contract = await factory.deploy({ gasPrice: args.gasPrice, gasLimit })
     await contract.deployed();
     args.genericHandlerContract = contract.address;
-    await contract.init(args.bridgeAddress, [], [], [], [], [], { gasPrice: args.gasPrice, gasLimit: args.gasLimit })
+    gasLimit = await contract.estimate.init(args.bridgeAddress, [], [], [], [], []);
+    console.log('GenericHandler init gas limit: ', gasLimit.toString());
+    await contract.init(args.bridgeAddress, [], [], [], [], [], { gasPrice: args.gasPrice, gasLimit })
     console.log("✓ GenericHandler contract deployed")
 }
 

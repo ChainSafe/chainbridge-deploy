@@ -17,7 +17,11 @@ const registerResourceCmd = new Command("register-resource")
 
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
         log(args,`Registering contract ${args.targetContract} with resource ID ${args.resourceId} on handler ${args.handler}`);
-        const tx = await bridgeInstance.adminSetResource(args.handler, args.resourceId, args.targetContract, { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await bridgeInstance.estimate.adminSetResource(args.handler, args.resourceId, args.targetContract);
+        }
+        const tx = await bridgeInstance.adminSetResource(args.handler, args.resourceId, args.targetContract, { gasPrice: args.gasPrice, gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -41,7 +45,11 @@ const registerGenericResourceCmd = new Command("register-generic-resource")
         }
 
         log(args,`Registering generic resource ID ${args.resourceId} with contract ${args.targetContract} on handler ${args.handler}`)
-        const tx = await bridgeInstance.adminSetGenericResource(args.handler, args.resourceId, args.targetContract, args.deposit, args.execute, { gasPrice: args.gasPrice, gasLimit: args.gasLimit })
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await bridgeInstance.estimate.adminSetGenericResource(args.handler, args.resourceId, args.targetContract, args.deposit, args.execute);
+        }
+        const tx = await bridgeInstance.adminSetGenericResource(args.handler, args.resourceId, args.targetContract, args.deposit, args.execute, { gasPrice: args.gasPrice, gasLimit })
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -55,7 +63,11 @@ const setBurnCmd = new Command("set-burn")
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
 
         log(args,`Setting contract ${args.tokenContract} as burnable on handler ${args.handler}`);
-        const tx = await bridgeInstance.adminSetBurnable(args.handler, args.tokenContract, { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await bridgeInstance.estimate.adminSetBurnable(args.handler, args.tokenContract);
+        }
+        const tx = await bridgeInstance.adminSetBurnable(args.handler, args.tokenContract, { gasPrice: args.gasPrice, gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -81,7 +93,11 @@ const cancelProposalCmd = new Command("cancel-proposal")
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
 
         log(args, `Setting proposal with chain ID ${args.chainId} and deposit nonce ${args.depositNonce} status to 'Cancelled`);
-        const tx = await bridgeInstance.adminCancelProposal(args.chainId, args.depositNonce, { gasPrice, gasLimit });
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await bridgeInstance.estimate.adminCancelProposal(args.chainId, args.depositNonce);
+        }
+        const tx = await bridgeInstance.adminCancelProposal(args.chainId, args.depositNonce, { gasPrice: args.gasPrice, gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 

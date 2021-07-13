@@ -22,6 +22,7 @@ program.option('--jsonWalletPassword <value>', '(Optional) Password for encrypte
 program.option('--gasLimit <value>', "Gas limit for transactions", constants.GAS_LIMIT);
 program.option('--gasPrice <value>', "Gas limit for transactions", "20000000")
 program.option('--networkId <value>', "Network Id")
+program.option('--optimism', 'Optimism chain', false)
 
 program.addCommand(deploy)
 program.addCommand(bridge)

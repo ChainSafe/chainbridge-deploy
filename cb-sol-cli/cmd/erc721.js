@@ -14,7 +14,11 @@ const mintCmd = new Command("mint")
         const erc721Instance = new ethers.Contract(args.erc721Address, constants.ContractABIs.Erc721Mintable.abi, args.wallet);
 
         log(args, `Minting token with id ${args.id} to ${args.wallet.address} on contract ${args.erc721Address}!`);
-        const tx = await erc721Instance.mint(args.wallet.address, ethers.utils.hexlify(args.id), args.metadata, { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await erc721Instance.estimate.mint(args.wallet.address, ethers.utils.hexlify(args.id), args.metadata);
+        }
+        const tx = await erc721Instance.mint(args.wallet.address, ethers.utils.hexlify(args.id), args.metadata, { gasPrice: args.gasPrice, gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -38,7 +42,11 @@ const addMinterCmd = new Command("add-minter")
         const erc721Instance = new ethers.Contract(args.erc721Address, constants.ContractABIs.Erc721Mintable.abi, args.wallet);
         const MINTER_ROLE = await erc721Instance.MINTER_ROLE()
         log(args, `Adding ${args.minter} as a minter of ${args.erc721Address}`)
-        const tx = await erc721Instance.grantRole(MINTER_ROLE, args.minter, { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await erc721Instance.estimate.grantRole(MINTER_ROLE, args.minter);
+        }
+        const tx = await erc721Instance.grantRole(MINTER_ROLE, args.minter, { gasPrice: args.gasPrice, gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -52,7 +60,11 @@ const approveCmd = new Command("approve")
         const erc721Instance = new ethers.Contract(args.erc721Address, constants.ContractABIs.Erc721Mintable.abi, args.wallet);
 
         log(args, `Approving ${args.recipient} to spend token ${args.id} from ${args.wallet.address} on contract ${args.erc721Address}!`);
-        const tx = await erc721Instance.approve(args.recipient, ethers.utils.hexlify(args.id), { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await erc721Instance.estimate.approve(args.recipient, ethers.utils.hexlify(args.id));
+        }
+        const tx = await erc721Instance.approve(args.recipient, ethers.utils.hexlify(args.id), { gasPrice: args.gasPrice, gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -83,11 +95,18 @@ const depositCmd = new Command("deposit")
         log(args, "Creating deposit to initiate transfer!")
 
         // Perform deposit
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await await bridgeInstance.estimate.deposit(
+                args.dest, // destination chain id
+                args.resourceId,
+                data);
+        }
         const tx = await bridgeInstance.deposit(
             args.dest, // destination chain id
             args.resourceId,
             data,
-            { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+            { gasPrice: args.gasPrice, gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 

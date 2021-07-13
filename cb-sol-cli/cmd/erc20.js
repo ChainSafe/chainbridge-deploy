@@ -13,7 +13,11 @@ const mintCmd = new Command("mint")
 
         const erc20Instance = new ethers.Contract(args.erc20Address, constants.ContractABIs.Erc20Mintable.abi, args.wallet);
         log(args, `Minting ${args.amount} tokens to ${args.wallet.address} on contract ${args.erc20Address}`);
-        const tx = await erc20Instance.mint(args.wallet.address, expandDecimals(args.amount, args.decimals), { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await erc20Instance.estimate.mint(args.wallet.address, expandDecimals(args.amount, args.decimals));
+        }
+        const tx = await erc20Instance.mint(args.wallet.address, expandDecimals(args.amount, args.decimals), { gasPrice: args.gasPrice, gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -26,7 +30,11 @@ const addMinterCmd = new Command("add-minter")
         const erc20Instance = new ethers.Contract(args.erc20Address, constants.ContractABIs.Erc20Mintable.abi, args.wallet);
         let MINTER_ROLE = await erc20Instance.MINTER_ROLE();
         log(args, `Adding ${args.minter} as a minter on contract ${args.erc20Address}`);
-        const tx = await erc20Instance.grantRole(MINTER_ROLE, args.minter, { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await erc20Instance.estimate.grantRole(MINTER_ROLE, args.minter);
+        }
+        const tx = await erc20Instance.grantRole(MINTER_ROLE, args.minter, { gasPrice: args.gasPrice, gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -40,7 +48,11 @@ const approveCmd = new Command("approve")
 
         const erc20Instance = new ethers.Contract(args.erc20Address, constants.ContractABIs.Erc20Mintable.abi, args.wallet);
         log(args, `Approving ${args.recipient} to spend ${args.amount} tokens from ${args.wallet.address}!`);
-        const tx = await erc20Instance.approve(args.recipient, expandDecimals(args.amount, args.parent.decimals), { gasPrice: args.gasPrice, gasLimit: args.gasLimit });
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await erc20Instance.estimate.approve(args.recipient, expandDecimals(args.amount, args.parent.decimals));
+        }
+        const tx = await erc20Instance.approve(args.recipient, expandDecimals(args.amount, args.parent.decimals), { gasPrice: args.gasPrice, gasLimit });
         await waitForTx(args.provider, tx.hash)
     })
 
@@ -71,11 +83,18 @@ const depositCmd = new Command("deposit")
         log(args, `Creating deposit to initiate transfer!`);
 
         // Make the deposit
+        let gasLimit = args.gasLimit;
+        if (args.optimism) {
+            gasLimit = await bridgeInstance.estimate.deposit(
+            args.dest, // destination chain id
+            args.resourceId,
+            data);
+        }
         let tx = await bridgeInstance.deposit(
             args.dest, // destination chain id
             args.resourceId,
             data,
-            { gasPrice: args.gasPrice, gasLimit: args.gasLimit }
+            { gasPrice: args.gasPrice, gasLimit }
         );
 
         await waitForTx(args.provider, tx.hash)
@@ -116,7 +135,11 @@ const wetcDepositCmd = new Command("wetc-deposit")
             await setupParentArgs(args, args.parent.parent)
 
             const wetcInstance = new ethers.Contract(args.wetcAddress, constants.ContractABIs.WETC.abi, args.wallet);
-            let tx = await wetcInstance.deposit({value: ethers.utils.parseEther(args.amount), gasPrice: args.gasPrice, gasLimit: args.gasLimit})
+            let gasLimit = args.gasLimit;
+            if (args.optimism) {
+                gasLimit = await wetcInstance.estimate.deposit({value: ethers.utils.parseEther(args.amount)});
+            }
+            let tx = await wetcInstance.deposit({value: ethers.utils.parseEther(args.amount), gasPrice: args.gasPrice, gasLimit})
             await waitForTx(args.provider, tx.hash)
             const newBalance = await wetcInstance.balanceOf(args.wallet.address)
             const decimals = await wetcInstance.decimals();
