@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ChainSafe/chainbridge-solidity.git"
+    "url": "git+https://github.com/automata-network/chainbridge-solidity.git"
   },
   "author": "ChainSafe Systems",
   "license": "LGPL-3.0",
