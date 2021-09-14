@@ -9,6 +9,7 @@ const ContractABIs = {
     Bridge: require(CONTRACT_PATH + "/Bridge.json"),
     Erc20Handler: require(CONTRACT_PATH + "/ERC20Handler.json"),
     Erc20Mintable: require("./contracts/ERC20Custom.json"),
+    Erc20Safe: require(CONTRACT_PATH + "/ERC20Safe.json"),
     Erc721Handler: require(CONTRACT_PATH + "/ERC721Handler.json"),
     Erc721Mintable: require(CONTRACT_PATH + "/ERC721MinterBurnerPauser.json"),
     GenericHandler: require(CONTRACT_PATH + "/GenericHandler.json"),

@@ -2,7 +2,7 @@ const ethers = require('ethers');
 const constants = require('../constants');
 
 const {Command} = require('commander');
-const {setupParentArgs, getFunctionBytes, waitForTx, log} = require("./utils")
+const {setupParentArgs, getFunctionBytes, waitForTx, log, expandDecimals} = require("./utils")
 
 const EMPTY_SIG = "0x00000000"
 
@@ -71,6 +71,20 @@ const queryIsBurnCmd = new Command("query-is-burn")
         log(args, `Getting if contract ${args.tokenContract} is registered as burnable on handler ${args.handler}: ${isBurn}`)
     })
 
+const fundErc20Safe = new Command("fund-erc20-safe")
+    .description("Fund the ERC20 Safe to lock the existing liquity on destination chain")
+    .option('--handler <address>', 'Handler contract address', constants.ERC20_HANDLER_ADDRESS)
+    .option('--tokenContract <address>', 'Token contract to be used for funding', constants.ERC20_ADDRESS)
+    .option('--amount <value>', "Amount to transfer", 1)
+    .action(async function (args) {
+        await setupParentArgs(args, args.parent.parent)
+        const handlerInstance = new ethers.Contract(args.handler, constants.ContractABIs.Erc20Safe.abi, args.wallet)
+
+        log(args, `Fund handler ${args.handler} with ${args.amount} amount of token ${args.tokenContract} from ${args.wallet.address}`);
+        const tx = await handlerInstance.fundERC20(args.tokenContract, args.wallet.address, expandDecimals(args.amount, args.parent.decimals), { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
+        await waitForTx(args.provider, tx.hash)
+    })
+
 const cancelProposalCmd = new Command("cancel-proposal")
     .description("Cancel a proposal that has passed the expiry threshold")
     .option('--bridge <address>', 'Bridge contract address', constants.BRIDGE_ADDRESS)
@@ -119,6 +133,7 @@ bridgeCmd.addCommand(registerResourceCmd)
 bridgeCmd.addCommand(registerGenericResourceCmd)
 bridgeCmd.addCommand(setBurnCmd)
 bridgeCmd.addCommand(queryIsBurnCmd)
+bridgeCmd.addCommand(fundErc20Safe)
 bridgeCmd.addCommand(cancelProposalCmd)
 bridgeCmd.addCommand(queryProposalCmd)
 bridgeCmd.addCommand(queryResourceId)
