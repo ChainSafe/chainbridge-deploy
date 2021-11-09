@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: LGPL-3.0-only
  */
 const ethers = require('ethers');
+require('dotenv').config();
 
 const CONTRACT_PATH = "./chainbridge-solidity/build/contracts"
 const ContractABIs = {
@@ -22,7 +23,7 @@ module.exports.ContractABIs = ContractABIs
 module.exports.ADMIN_ROLE = "0x0000000000000000000000000000000000000000000000000000000000000000"
 // This is just Alice's key.
 module.exports.deployerAddress = "0xff93B45308FD417dF303D6515aB04D9e89a750Ca";
-module.exports.deployerPrivKey = "0x000000000000000000000000000000000000000000000000000000616c696365";
+module.exports.deployerPrivKey = process.env.PRIVATE_KEY ? process.env.PRIVATE_KEY : "0x000000000000000000000000000000000000000000000000000000616c696365";
 
 module.exports.relayerAddresses = [
     "0xff93B45308FD417dF303D6515aB04D9e89a750Ca", // Alice Public Address
@@ -63,3 +64,6 @@ module.exports.ERC721_RESOURCEID = ethers.utils.hexZeroPad((this.ERC721_ADDRESS 
 module.exports.GENERIC_RESOURCEID = ethers.utils.hexZeroPad((this.CENTRIFUGE_ASSET_STORE_ADDRESS + ethers.utils.hexlify(this.DEFAULT_SOURCE_ID).substr(2)), 32);
 
 module.exports.ERC20_PROPOSAL_HASH = "0x19b14d095647bb784f237072e14df1133fbd2008c5039c469321d77099a7b6da"
+
+module.exports.gatewayUrl = process.env.GATEWAY_URL ? process.env.GATEWAY_URL : "http://localhost:8545";
+module.exports.gasPrice = process.env.GAS_PRICE ? process.env.GAS_PRICE : "20000000";
