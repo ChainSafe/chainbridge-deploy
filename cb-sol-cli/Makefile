@@ -12,5 +12,8 @@ install: fetch-contracts compile
 	@echo " > \033[32mInstalling cb-sol-cli... \033[0m "
 	npm link .
 
+build: fetch-contracts compile
+	npm install 
+
 clean:
 	rm -rf chainbridge-solidity/
