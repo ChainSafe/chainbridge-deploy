@@ -1,5 +1,12 @@
 # ChainBridge Deploy Tools
 
+### Installation
+
+git clone https://github.com/ChainSafe/chainbridge-deploy \
+&& cd chainbridge-deploy/cb-sol-cli \
+&& npm install \
+&& make install
+
 ## Config Builder
 
 Please see the [README](/cfgBuilder/README.md).
