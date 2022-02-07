@@ -23,14 +23,14 @@ function _tmpl_chain() {
         $1{
 			"name": "${NETWORK_NAME}",
 			"type": "ethereum",
-			"id": ${NETWORK_ID},
+			"id": ${DOMAIN_ID},
 			"blockStorePath": "chainbridge.${NETWORK_NAME}.db",
 			"blockConfirmations": 1,
 			"pollingIntervalSecs": 1,
 			"cacheTtl": 300,
 			"endpoint": "${NETWORK_RPC}",
 			"opts": {
-				"chainId": ${NETWORK_ID},
+				"chainId": ${CHAIN_ID},
 				"privateKey": "$2",
 				"bridge": "${BRIDGE_ADDR}",
 				"erc20Handler": "${ERC20_HANDLER}",

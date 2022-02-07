@@ -1,3 +1,4 @@
 .idea/
 node_modules/
 chainbridge-solidity/
+cb-sol-cli/env.sh

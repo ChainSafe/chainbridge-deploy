@@ -2,7 +2,7 @@ const ethers = require('ethers');
 const constants = require('../constants');
 
 const {Command} = require('commander');
-const {setupParentArgs, waitForTx, log} = require("./utils")
+const {setupParentArgs, waitForTx, log, expandDecimals} = require("./utils")
 
 const isRelayerCmd = new Command("is-relayer")
     .description("Check if address is relayer")
@@ -121,7 +121,11 @@ const withdrawCmd = new Command("withdraw")
         await setupParentArgs(args, args.parent.parent)
         const bridgeInstance = new ethers.Contract(args.bridge, constants.ContractABIs.Bridge.abi, args.wallet);
         log(args, `Withdrawing tokens (${args.amountOrId}) in contract ${args.tokenContract} to recipient ${args.recipient}`)
-        let tx = await bridgeInstance.adminWithdraw(args.handler, args.tokenContract, args.recipient, args.amountOrId)
+        const data = '0x' +
+            ethers.utils.hexZeroPad(ethers.utils.hexlify(args.tokenContract), 32).substr(2) +
+            ethers.utils.hexZeroPad(ethers.utils.hexlify(args.recipient), 32).substr(2) +
+            ethers.utils.hexZeroPad(ethers.utils.bigNumberify(expandDecimals(args.amountOrId, args.parent.decimals)).toHexString(), 32).substr(2);
+        let tx = await bridgeInstance.adminWithdraw(args.handler, data)
         await waitForTx(args.provider, tx.hash)
     })
 

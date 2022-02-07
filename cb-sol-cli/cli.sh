@@ -26,8 +26,9 @@ export GAS_PRICE=40000000000
 export GAS_LIMIT=100000
 export GAS_LIMIT_2=200000
 export GAS_LIMIT_DEPLOY=4000000
-export ERC20_SYMBOL=ALT1
-export ERC20_NAME=AltToken1
+if [[ "$AMOUNT" == "" ]]; then
+	export AMOUNT=0.001
+fi
 
 function _to_list() {
 	if [[ "$1" == "" ]]; then
@@ -47,21 +48,27 @@ function env_value() {
 
 function _env() {
 	network=$(upper $1)
-	export NETWORK_ID=$(env_value NETWORK_ID $network)
+	export CHAIN_ID=$(env_value CHAIN_ID $network)
+	export DOMAIN_ID=$(env_value DOMAIN_ID $network)
+	if [[ "$DOMAIN_ID" == "" ]]; then
+		export DOMAIN_ID=$CHAIN_ID
+	fi
 	export NETWORK_NAME=$network
 	export NETWORK_RPC=$(env_value NETWORK_RPC $network)
+	export ERC20_SYMBOL=$TOKEN
+	export ERC20_NAME=$(env_value ERC20_NAME $ERC20_SYMBOL)
 	export ERC20_HANDLER=$(env_value ERC20_HANDLER $network)
 	export RESOURCE_ID=$(env_value RESOURCE_ID $ERC20_SYMBOL)
 	export ERC20_ADDR=$(env_value ERC20_ADDR_${ERC20_SYMBOL} $network)
 	export BRIDGE_ADDR=$(env_value BRIDGE_ADDR $network)
-	if [[ "$NETWORK_ID" == "" ]]; then
+	if [[ "$CHAIN_ID" == "" ]]; then
 		echo "invalid network: $1" >&2
 		exit 1
 	fi
 }
 
 function _mint_erc20_one() {
-	cb-sol-cli --privateKey $1 --url ${NETWORK_RPC} --gasLimit ${GAS_LIMIT} --gasPrice ${GAS_PRICE} erc20 mint --amount 100000 --erc20Address ${ERC20_ADDR} --recipient "$2"
+	_PK=$1 _call erc20 mint --amount 100000 --erc20Address ${ERC20_ADDR} --recipient "$2"
 }
 
 function mint_erc20() {
@@ -75,7 +82,7 @@ function mint_erc20_to_handler() {
 }
 
 function _approve() {
-	cb-sol-cli --privateKey $1 --url ${NETWORK_RPC} --gasLimit ${GAS_LIMIT} --gasPrice ${GAS_PRICE} erc20 approve --amount 1000000000 --erc20Address ${ERC20_ADDR} --recipient ${ERC20_HANDLER}
+	_PK=$1 _call erc20 approve --amount 1000000000 --erc20Address ${ERC20_ADDR} --recipient ${ERC20_HANDLER}
 }
 
 function approve() {
@@ -100,7 +107,7 @@ function gen_config() {
 }
 
 function add_resource() {
-	cb-sol-cli --privateKey ${DEPLOY_ACCOUNT_PRIVATE_KEY} --url ${NETWORK_RPC} --gasLimit ${GAS_LIMIT_2} --gasPrice ${GAS_PRICE} bridge register-resource --bridge ${BRIDGE_ADDR} --handler ${ERC20_HANDLER} --targetContract ${ERC20_ADDR} --resourceId ${RESOURCE_ID} 
+	_GL=${GAS_LIMIT_2} _call bridge register-resource --bridge ${BRIDGE_ADDR} --handler ${ERC20_HANDLER} --targetContract ${ERC20_ADDR} --resourceId ${RESOURCE_ID} 
 }
 
 function deploy() {
@@ -108,7 +115,7 @@ function deploy() {
 		echo "missing env DEPLOY_ACCOUNT_PRIVATE_KEY" >&2
 		return 1
 	fi
-	cb-sol-cli --privateKey ${DEPLOY_ACCOUNT_PRIVATE_KEY} --url ${NETWORK_RPC} --gasLimit ${GAS_LIMIT_DEPLOY} --gasPrice ${GAS_PRICE} deploy --bridge --erc20Handler --erc20 --chainId ${NETWORK_ID} --networkId ${NETWORK_ID} --relayerThreshold ${THRESHOLD} --relayers ${RELAYERS} --erc20Symbol ${ERC20_SYMBOL} --erc20Name ${ERC20_NAME}
+	_GL=${GAS_LIMIT_DEPLOY} _call deploy --bridge --erc20Handler --erc20 --chainId ${DOMAIN_ID} --relayerThreshold ${THRESHOLD} --relayers ${RELAYERS} --erc20Symbol ${ERC20_SYMBOL} --erc20Name ${ERC20_NAME}
 }
 
 function init() {
@@ -122,15 +129,42 @@ function init() {
 	add_resource
 }
 
+function _call() {
+	if [[ "$_PK" == "" ]]; then
+		export _PK=${DEPLOY_ACCOUNT_PRIVATE_KEY}
+	fi
+	if [[ "$_GL" == "" ]]; then
+		export _GL=${GAS_LIMIT}
+	fi
+	if [[ "$DEBUG" != "" ]]; then
+		echo cb-sol-cli --privateKey $_PK --url ${NETWORK_RPC} --gasLimit $_GL --gasPrice ${GAS_PRICE} $@
+	else
+		cb-sol-cli --privateKey $_PK --url ${NETWORK_RPC} --gasLimit $_GL --gasPrice ${GAS_PRICE} $@
+	fi
+}
+
+function withdraw() {
+	recipient=$1
+	amountOrId=$2
+	if [[ "$amountOrId" == "" ]]; then
+		echo "$0 $NETWORK_NAME withdraw \${recipient} \${amountOrId}"
+		return 1
+	fi
+	_call admin withdraw --bridge ${BRIDGE_ADDR} --handler ${ERC20_HANDLER} --tokenContract ${ERC20_ADDR} --amountOrId $amountOrId --recipient $recipient
+}
+
 function deposit() {
 	if [[ "$2" == "" ]]; then
 		echo "usage $0"' deposit ${destNetworkName} ${recipient}' >&2
 		return 1
 	fi
-	dest=$(env_value NETWORK_ID $(upper $1))
+	dest=$(env_value DOMAIN_ID $(upper $1))
+	if [[ "$dest" == "" ]]; then
+		dest=$(env_value CHAIN_ID $(upper $1))
+	fi
 	recipient=$2
 	echo $TESTS_PRIVATE_KEY | _to_list 1 | while read pk; do
-		cb-sol-cli --privateKey $pk --url ${NETWORK_RPC} --gasLimit ${GAS_LIMIT_2} --gasPrice ${GAS_PRICE} erc20 deposit --resourceId ${RESOURCE_ID} --bridge ${BRIDGE_ADDR} --dest $dest --recipient $recipient --amount 0.1
+		_PK=$pk _GL=${GAS_LIMIT_2} _call erc20 deposit --resourceId ${RESOURCE_ID} --bridge ${BRIDGE_ADDR} --dest $dest --recipient $recipient --amount $AMOUNT
 	done
 }
 
