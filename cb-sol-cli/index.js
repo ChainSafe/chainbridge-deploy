@@ -20,7 +20,7 @@ program.option('--privateKey <value>', 'Private key to use', constants.deployerP
 program.option('--jsonWallet <path>', '(Optional) Encrypted JSON wallet');
 program.option('--jsonWalletPassword <value>', '(Optional) Password for encrypted JSON wallet');
 program.option('--gasLimit <value>', "Gas limit for transactions", "8000000")
-program.option('--gasPrice <value>', "Gas limit for transactions", "20000000")
+program.option('--gasPrice <value>', "Gas price for transactions", "20000000")
 program.option('--networkId <value>', "Network Id")
 
 program.addCommand(deploy)
