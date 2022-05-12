@@ -26,7 +26,7 @@ const addMinterCmd = new Command("add-minter")
         const erc20Instance = new ethers.Contract(args.erc20Address, constants.ContractABIs.Erc20Mintable.abi, args.wallet);
         let MINTER_ROLE = await erc20Instance.MINTER_ROLE();
         log(args, `Adding ${args.minter} as a minter on contract ${args.erc20Address}`);
-        const tx = await erc20Instance.grantRole(MINTER_ROLE, args.minter);
+        const tx = await erc20Instance.grantRole(MINTER_ROLE, args.minter, { gasPrice: args.gasPrice, gasLimit: args.gasLimit});
         await waitForTx(args.provider, tx.hash)
     })
 
